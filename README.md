@@ -53,31 +53,10 @@ All computation is done locally on the device.
     implementation "camp.visual.eyedid.android.gazetracker:eyedid-gazetracker:{version}"
   }
   ```
-### **Environment Set-ups** (iOS)
-
-- Add permission to your Info.plist file. 
-  ```
-    <key>NSCameraUsageDescription</key>
-    <string></string>
-  ```
-- Add `PERMISSION_CAMERA=1` to your Podfile.
-
-  ```
-  target.build_configurations.each do |config|
-      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
-        '$(inherited)',
-        ...
-        'PERMISSION_CAMERA=1'
-      ]
-  end
-  ```
-- Pod install from terminal.
-  ```bash
-  pod install
-  ```
-
+  
 ### 2. Obtain a License Key
   Eyedid SDK requires a License Key for operation. You can obtain the key from [manage.eyedid.ai](https://manage.eyedid.ai).
+  [팀 노션에 적어놨습니다.]
 
 ### 3. How to use
 
