@@ -1,0 +1,26 @@
+package camp.visual.sdk.eyedid_flutter.constants
+
+object MethodName {
+    const val INIT_GAZE_TRACKER = "initGazeTracker"
+    const val RELEASE_GAZE_TRACKER = "releaseGazeTracker"
+    const val GET_VERSION_NAME = "getVersionName"
+    const val START_TRACKING = "startTracking"
+    const val STOP_TRACKING = "stopTracking"
+    const val IS_TRACKING = "isTracking"
+    const val HAS_CAMERA_POSITIONS = "hasCameraPositions"
+    const val ADD_CAMERA_POSITION = "addCameraPosition"
+    const val GET_CAMERA_POSITION = "getCameraPosition"
+    const val GET_CAMERA_POSITION_LIST = "getCameraPositionList"
+    const val SELECT_CAMERA_POSITION = "selectCameraPosition"
+    const val SET_TRACKING_FPS = "setTrackingFPS"
+    const val START_CALIBRATION = "startCalibration"
+    const val STOP_CALIBRATION = "stopCalibration"
+    const val IS_CALIBRATING = "isCalibrating"
+    const val START_COLLECT_SAMPLES = "startCollectSamples"
+    const val SET_CALIBRATION_DATA = "setCalibrationData"
+    const val SET_ATTENTION_REGION = "setAttentionRegion"
+    const val GET_ATTENTION_REGION = "getAttentionRegion"
+    const val REMOVE_ATTENTION_REGION = "removeAttentionRegion"
+    const val SET_FORCED_ORIENTATION = "setForcedOrientation"
+    const val RESET_FORCED_ORIENTATION = "resetForcedOrientation"
+}

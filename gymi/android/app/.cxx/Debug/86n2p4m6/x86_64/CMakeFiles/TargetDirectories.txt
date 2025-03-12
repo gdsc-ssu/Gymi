@@ -1,0 +1,2 @@
+/Users/jerry/Documents/eyedid-flutter-sdk-main/example/android/app/.cxx/Debug/86n2p4m6/x86_64/CMakeFiles/edit_cache.dir
+/Users/jerry/Documents/eyedid-flutter-sdk-main/example/android/app/.cxx/Debug/86n2p4m6/x86_64/CMakeFiles/rebuild_cache.dir
