@@ -1,5 +1,5 @@
 ---
-
+name: "[feature] 구현할 내용"
 about: Suggest an idea for this project
 title: "[feature] 구현할 내용"
 labels: ''
