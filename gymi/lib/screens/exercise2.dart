@@ -1,9 +1,8 @@
 import 'dart:async';
-
+import 'package:flutter/material.dart';
 import 'package:eyedid_flutter/events/eyedid_flutter_metrics.dart';
 import 'package:eyedid_flutter/events/eyedid_flutter_status.dart';
 import 'package:eyedid_flutter/eyedid_flutter.dart';
-import 'package:flutter/material.dart';
 import '../service/gaze_tracker_service.dart';
 import 'package:eyedid_flutter_example/gaze_overlay.dart';
 
@@ -14,7 +13,7 @@ class Exercies2 extends StatefulWidget {
   State<Exercies2> createState() => _Exercies2State();
 }
 
-class _Exercies2State extends State<Exercies2> {
+class _Exercies2State extends State<Exercies2> with WidgetsBindingObserver {
   final _gazeService = GazeTrackerService();
 
   // 현재 시선 위치
@@ -24,11 +23,25 @@ class _Exercies2State extends State<Exercies2> {
   // 현재 방향 (기본값은 중앙)
   String _currentDirection = 'center';
 
+  // 실시간 시선 방향 (완료 체크용이 아닌, 현재 실제 바라보는 방향)
+  String _realTimeDirection = 'center';
+
+  // 각 방향 완료 상태 트래킹
+  final Map<String, bool> _completedDirections = {
+    'up': false,
+    'down': false,
+    'left': false,
+    'right': false,
+  };
+
   // 각 방향별 타이머
   Timer? _upTimer;
   Timer? _downTimer;
   Timer? _leftTimer;
   Timer? _rightTimer;
+
+  // 홈 화면 자동 복귀 타이머
+  Timer? _homeNavigationTimer;
 
   // 각 방향별 응시 시작 시간
   DateTime? _upStartTime;
@@ -37,26 +50,22 @@ class _Exercies2State extends State<Exercies2> {
   DateTime? _rightStartTime;
 
   // 응시 판정을 위한 체류 시간 (밀리초)
-  final int _dwellTime = 3000;
-
-  // 방향별 아이콘
-  final Map<String, IconData> _directionIcons = {
-    'center': Icons.adjust, // 중앙
-    'up': Icons.arrow_upward, // 위
-    'down': Icons.arrow_downward, // 아래
-    'left': Icons.arrow_back, // 왼쪽
-    'right': Icons.arrow_forward, // 오른쪽
-  };
+  final int _dwellTime = 2000; // 2초로 단축
 
   // 각 영역의 경계를 정의하기 위한 비율 (전체 화면 크기 대비)
   final double _centerThreshold = 0.3; // 중앙 영역의 크기
 
   StreamSubscription<dynamic>? _gazeSubscription;
+  bool _screenActive = true;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _setupGazeTracking();
+
+    // GazeOverlay 숨기기 (우리가 직접 그린 점만 사용)
+    _gazeService.setShowOverlay(false);
   }
 
   @override
@@ -65,13 +74,28 @@ class _Exercies2State extends State<Exercies2> {
     // 컨텍스트를 안전하게 업데이트 (빌드 프로세스 이후에 실행됨)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _gazeService.updateContext(context);
+      _screenActive = true;
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _screenActive) {
+      // 앱이 포그라운드로 돌아왔을 때 오버레이는 계속 숨김 상태 유지
+      _gazeService.setShowOverlay(false);
+    }
   }
 
   @override
   void dispose() {
     _gazeSubscription?.cancel();
     _cancelAllTimers();
+    WidgetsBinding.instance.removeObserver(this);
+    _screenActive = false;
+
+    // 화면을 나갈 때 GazeOverlay 다시 활성화
+    _gazeService.setShowOverlay(true);
+
     super.dispose();
   }
 
@@ -80,12 +104,13 @@ class _Exercies2State extends State<Exercies2> {
     _downTimer?.cancel();
     _leftTimer?.cancel();
     _rightTimer?.cancel();
+    _homeNavigationTimer?.cancel();
   }
 
   Future<void> _setupGazeTracking() async {
     // 싱글톤 서비스의 스트림을 구독
     _gazeSubscription = _gazeService.gazePositionStream.listen((data) {
-      if (mounted) {
+      if (mounted && _screenActive) {
         setState(() {
           _x = data['x'];
           _y = data['y'];
@@ -118,11 +143,9 @@ class _Exercies2State extends State<Exercies2> {
     if (offsetX.abs() < centerWidthThreshold &&
         offsetY.abs() < centerHeightThreshold) {
       _resetAllGazeTimes();
-      if (_currentDirection != 'center') {
-        setState(() {
-          _currentDirection = 'center';
-        });
-      }
+      setState(() {
+        _realTimeDirection = 'center';
+      });
       return;
     }
 
@@ -135,6 +158,13 @@ class _Exercies2State extends State<Exercies2> {
     } else {
       // 상하 방향이 더 강함
       direction = offsetY > 0 ? 'down' : 'up';
+    }
+
+    // 실시간 방향 업데이트
+    if (_realTimeDirection != direction) {
+      setState(() {
+        _realTimeDirection = direction;
+      });
     }
 
     // 각 방향에 따른 타이머 처리
@@ -150,7 +180,9 @@ class _Exercies2State extends State<Exercies2> {
         _upTimer = Timer(Duration(milliseconds: _dwellTime), () {
           setState(() {
             _currentDirection = 'up';
+            _completedDirections['up'] = true;
           });
+          _checkAllDirectionsCompleted();
         });
       }
     } else if (direction == 'down') {
@@ -160,7 +192,9 @@ class _Exercies2State extends State<Exercies2> {
         _downTimer = Timer(Duration(milliseconds: _dwellTime), () {
           setState(() {
             _currentDirection = 'down';
+            _completedDirections['down'] = true;
           });
+          _checkAllDirectionsCompleted();
         });
       }
     } else if (direction == 'left') {
@@ -170,7 +204,9 @@ class _Exercies2State extends State<Exercies2> {
         _leftTimer = Timer(Duration(milliseconds: _dwellTime), () {
           setState(() {
             _currentDirection = 'left';
+            _completedDirections['left'] = true;
           });
+          _checkAllDirectionsCompleted();
         });
       }
     } else if (direction == 'right') {
@@ -180,9 +216,25 @@ class _Exercies2State extends State<Exercies2> {
         _rightTimer = Timer(Duration(milliseconds: _dwellTime), () {
           setState(() {
             _currentDirection = 'right';
+            _completedDirections['right'] = true;
           });
+          _checkAllDirectionsCompleted();
         });
       }
+    }
+  }
+
+  void _checkAllDirectionsCompleted() {
+    if (_completedDirections['up']! &&
+        _completedDirections['down']! &&
+        _completedDirections['left']! &&
+        _completedDirections['right']!) {
+      // 모든 방향 완료 시 2초 후 홈 화면으로 이동
+      _homeNavigationTimer = Timer(const Duration(seconds: 2), () {
+        if (mounted && _screenActive) {
+          Navigator.of(context).pop();
+        }
+      });
     }
   }
 
@@ -226,46 +278,224 @@ class _Exercies2State extends State<Exercies2> {
     _rightTimer = null;
   }
 
+  // 방향에 따른 텍스트 반환 (한글)
+  String _getDirectionText(String direction) {
+    switch (direction) {
+      case 'up':
+        return '위';
+      case 'down':
+        return '아래';
+      case 'left':
+        return '왼쪽';
+      case 'right':
+        return '오른쪽';
+      default:
+        return '중앙';
+    }
+  }
+
+  // 남은 방향을 한글로 반환
+  String _getRemainingDirections() {
+    List<String> remaining = [];
+
+    if (!_completedDirections['up']!) remaining.add('위');
+    if (!_completedDirections['down']!) remaining.add('아래');
+    if (!_completedDirections['left']!) remaining.add('왼쪽');
+    if (!_completedDirections['right']!) remaining.add('오른쪽');
+
+    if (remaining.isEmpty) {
+      return '모든 방향 완료!';
+    } else {
+      return remaining.join(', ');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: true,
       onPopInvoked: (didPop) {
-        // 뒤로 가기 전에 오버레이 제거
-        GazeOverlay.remove();
+        _screenActive = false;
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('시선 방향 인식 연습'),
+          title: const Text('Eye Direction Detection'),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
         ),
         body: Stack(
           children: [
-            // 화면을 4분할하여 각 영역의 경계를 시각화
-            _buildScreenDividers(),
-
-            // 중앙에 현재 방향을 나타내는 큰 아이콘 표시
+            // 세로 중앙선 (위치 정확히 중앙에 배치)
             Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    _directionIcons[_currentDirection] ?? Icons.adjust,
-                    size: 100,
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                width: 1,
+                color: Colors.grey.withOpacity(0.5),
+              ),
+            ),
+
+            // 가로 중앙선 (위치 정확히 중앙에 배치)
+            Center(
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: 1,
+                color: Colors.grey.withOpacity(0.5),
+              ),
+            ),
+
+            // 방향별 경계선 표시 (실시간 방향 기준)
+            // 위쪽 경계선
+            if (_realTimeDirection == 'up')
+              Positioned(
+                top: 10,
+                left: 0,
+                right: 0,
+                child: Container(
+                  height: 3,
+                  color: Colors.blue,
+                ),
+              ),
+
+            // 아래쪽 경계선
+            if (_realTimeDirection == 'down')
+              Positioned(
+                bottom: 10,
+                left: 0,
+                right: 0,
+                child: Container(
+                  height: 3,
+                  color: Colors.blue,
+                ),
+              ),
+
+            // 왼쪽 경계선
+            if (_realTimeDirection == 'left')
+              Positioned(
+                top: 0,
+                bottom: 0,
+                left: 10,
+                child: Container(
+                  width: 3,
+                  color: Colors.blue,
+                ),
+              ),
+
+            // 오른쪽 경계선
+            if (_realTimeDirection == 'right')
+              Positioned(
+                top: 0,
+                bottom: 0,
+                right: 10,
+                child: Container(
+                  width: 3,
+                  color: Colors.blue,
+                ),
+              ),
+
+            // 방향 완료 상태 표시 (각 방향에 작은 체크 마크)
+            Positioned(
+              top: MediaQuery.of(context).size.height * 0.15,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: _completedDirections['up']!
+                    ? const Icon(Icons.check_circle,
+                        color: Colors.green, size: 24)
+                    : const Text('위',
+                        style: TextStyle(color: Colors.grey, fontSize: 16)),
+              ),
+            ),
+
+            Positioned(
+              bottom: MediaQuery.of(context).size.height * 0.15,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: _completedDirections['down']!
+                    ? const Icon(Icons.check_circle,
+                        color: Colors.green, size: 24)
+                    : const Text('아래',
+                        style: TextStyle(color: Colors.grey, fontSize: 16)),
+              ),
+            ),
+
+            Positioned(
+              top: MediaQuery.of(context).size.height / 2 - 12,
+              left: MediaQuery.of(context).size.width * 0.15,
+              child: _completedDirections['left']!
+                  ? const Icon(Icons.check_circle,
+                      color: Colors.green, size: 24)
+                  : const Text('왼쪽',
+                      style: TextStyle(color: Colors.grey, fontSize: 16)),
+            ),
+
+            Positioned(
+              top: MediaQuery.of(context).size.height / 2 - 12,
+              right: MediaQuery.of(context).size.width * 0.15,
+              child: _completedDirections['right']!
+                  ? const Icon(Icons.check_circle,
+                      color: Colors.green, size: 24)
+                  : const Text('오른쪽',
+                      style: TextStyle(color: Colors.grey, fontSize: 16)),
+            ),
+
+            // 시선 좌표 표시 원 (단일 원으로 표시)
+            Positioned(
+              left: _x - 10,
+              top: _y - 10,
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
                     color: Colors.blue,
-                  ),
-                  const SizedBox(height: 20),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blue.withOpacity(0.4),
+                        blurRadius: 15,
+                        spreadRadius: 5,
+                      )
+                    ]),
+              ),
+            ),
+
+            // 정보 표시 영역 (하단)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 100,
+              child: Column(
+                children: [
                   Text(
-                    '현재 방향: $_currentDirection',
-                    style: const TextStyle(fontSize: 24),
+                    'Current Direction: ${_realTimeDirection == 'center' ? '중앙' : _getDirectionText(_realTimeDirection)}',
+                    style: const TextStyle(
+                        fontSize: 22, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   Text(
-                    '시선 좌표: (${_x.toStringAsFixed(1)}, ${_y.toStringAsFixed(1)})',
-                    style: const TextStyle(fontSize: 16),
+                    'Gaze Coordinates: (${_x.toStringAsFixed(1)}, ${_y.toStringAsFixed(1)})',
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 24),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
+                    child: Text(
+                      // 완료된 방향과 남은 방향을 한글로 표시
+                      '남은 방향: ${_getRemainingDirections()}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: _completedDirections.values.every((v) => v)
+                            ? Colors.green
+                            : Colors.black87,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   const Text(
-                    '특정 방향을 3초간 응시하면\n해당 방향의 아이콘으로 변경됩니다.',
+                    'Gaze at a direction for 2 seconds\nto change the displayed icon.',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 16),
                   ),
@@ -276,111 +506,5 @@ class _Exercies2State extends State<Exercies2> {
         ),
       ),
     );
-  }
-
-  Widget _buildScreenDividers() {
-    return CustomPaint(
-      size: Size.infinite,
-      painter: ScreenDividerPainter(centerThreshold: _centerThreshold),
-    );
-  }
-}
-
-// 화면 분할 시각화를 위한 CustomPainter
-class ScreenDividerPainter extends CustomPainter {
-  final double centerThreshold;
-
-  ScreenDividerPainter({required this.centerThreshold});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
-      ..color = Colors.grey.withOpacity(0.3)
-      ..strokeWidth = 2;
-
-    final double centerX = size.width / 2;
-    final double centerY = size.height / 2;
-
-    final double centerWidthThreshold = size.width * centerThreshold / 2;
-    final double centerHeightThreshold = size.height * centerThreshold / 2;
-
-    // 중앙 영역 사각형
-    canvas.drawRect(
-      Rect.fromLTRB(
-        centerX - centerWidthThreshold,
-        centerY - centerHeightThreshold,
-        centerX + centerWidthThreshold,
-        centerY + centerHeightThreshold,
-      ),
-      paint,
-    );
-
-    // 가로 분할선
-    canvas.drawLine(
-      Offset(0, centerY),
-      Offset(size.width, centerY),
-      paint,
-    );
-
-    // 세로 분할선
-    canvas.drawLine(
-      Offset(centerX, 0),
-      Offset(centerX, size.height),
-      paint,
-    );
-
-    // 각 영역의 이름 표시
-    final TextPainter textPainter = TextPainter(
-      textDirection: TextDirection.ltr,
-    );
-
-    // 위쪽 영역
-    textPainter.text = const TextSpan(
-      text: '위',
-      style: TextStyle(color: Colors.grey, fontSize: 24),
-    );
-    textPainter.layout();
-    textPainter.paint(
-        canvas,
-        Offset(centerX - textPainter.width / 2,
-            centerY - centerHeightThreshold - 50));
-
-    // 아래쪽 영역
-    textPainter.text = const TextSpan(
-      text: '아래',
-      style: TextStyle(color: Colors.grey, fontSize: 24),
-    );
-    textPainter.layout();
-    textPainter.paint(
-        canvas,
-        Offset(centerX - textPainter.width / 2,
-            centerY + centerHeightThreshold + 20));
-
-    // 왼쪽 영역
-    textPainter.text = const TextSpan(
-      text: '왼쪽',
-      style: TextStyle(color: Colors.grey, fontSize: 24),
-    );
-    textPainter.layout();
-    textPainter.paint(
-        canvas,
-        Offset(centerX - centerWidthThreshold - 70,
-            centerY - textPainter.height / 2));
-
-    // 오른쪽 영역
-    textPainter.text = const TextSpan(
-      text: '오른쪽',
-      style: TextStyle(color: Colors.grey, fontSize: 24),
-    );
-    textPainter.layout();
-    textPainter.paint(
-        canvas,
-        Offset(centerX + centerWidthThreshold + 20,
-            centerY - textPainter.height / 2));
-  }
-
-  @override
-  bool shouldRepaint(covariant ScreenDividerPainter oldDelegate) {
-    return oldDelegate.centerThreshold != centerThreshold;
   }
 }
