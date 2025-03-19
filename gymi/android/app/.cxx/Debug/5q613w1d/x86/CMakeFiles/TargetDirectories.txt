@@ -1,0 +1,2 @@
+/Users/imhyeong-gyu/projects/Gymi/gymi/android/app/.cxx/Debug/5q613w1d/x86/CMakeFiles/edit_cache.dir
+/Users/imhyeong-gyu/projects/Gymi/gymi/android/app/.cxx/Debug/5q613w1d/x86/CMakeFiles/rebuild_cache.dir
