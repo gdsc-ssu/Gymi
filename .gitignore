@@ -299,6 +299,6 @@ fabric.properties
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,xcode,visualstudiocode,androidstudio,gradle,cocoapods,flutter
 
-# .gitignore 파일에 다음 내용 추가
-android/app/.cxx/
+
+gymi/android/app/.cxx/
 **/hash_key.txt
