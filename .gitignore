@@ -298,3 +298,7 @@ fabric.properties
 !/gradle/wrapper/gradle-wrapper.jar
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,xcode,visualstudiocode,androidstudio,gradle,cocoapods,flutter
+
+
+gymi/android/app/.cxx/
+**/hash_key.txt
