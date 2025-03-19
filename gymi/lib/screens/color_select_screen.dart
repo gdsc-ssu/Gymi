@@ -23,7 +23,7 @@ class _FirstScreenState extends State<FirstScreen> {
             child: ClipRect(
               child: Image.asset(
                 'assets/images/gymiBackground.png', // ✅ PNG 이미지 경로
-                fit: BoxFit.cover, // ✅ 화면 크기에 맞춰 자연스럽게 채우기
+                fit: BoxFit.fitHeight, // ✅ 화면 크기에 맞춰 자연스럽게 채우기
                 width: 700,
                 height: 900,
               ),
@@ -35,7 +35,7 @@ class _FirstScreenState extends State<FirstScreen> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 100,
+                      horizontal: 150,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,28 +83,31 @@ class _FirstScreenState extends State<FirstScreen> {
                 ],
               ),
               const SizedBox(
-                height: 104,
+                height: 70,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const SecondScreen(
-                                x: 10, y: 10, gazeColor: Colors.black)
-                            // 예시로 secondScreen을 넣으면 수정할 것
-                            ),
-                      );
-                    },
-                    child: const Icon(
-                      Icons.chevron_right_sharp,
-                      color: Colors.white,
-                      size: 100,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 40, 0),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SecondScreen(
+                                  x: 10, y: 10, gazeColor: Colors.black)
+                              // 예시로 secondScreen을 넣으면 수정할 것
+                              ),
+                        );
+                      },
+                      child: Image.asset(
+                        'assets/images/Vector.png',
+                        height: 170,
+                        width: 50,
+                      ),
                     ),
-                  )
+                  ),
                 ],
               ),
               const SizedBox(
