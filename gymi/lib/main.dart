@@ -6,6 +6,7 @@ import 'package:eyedid_flutter_example/%08screens/second_screen.dart';
 import 'package:eyedid_flutter_example/gaze_overlay.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:eyedid_flutter_example/%08screens/exercise2.dart';
 
 import 'package:flutter/services.dart';
 import 'package:eyedid_flutter/gaze_tracker_options.dart';
@@ -13,6 +14,7 @@ import 'package:eyedid_flutter/events/eyedid_flutter_metrics.dart';
 import 'package:eyedid_flutter/events/eyedid_flutter_status.dart';
 import 'package:eyedid_flutter/events/eyedid_flutter_calibration.dart';
 import 'package:eyedid_flutter/eyedid_flutter.dart';
+import 'service/gaze_tracker_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -53,8 +55,10 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+// main.dart 파일의 _MyHomePageState 클래스 수정 부분
+
 class _MyHomePageState extends State<MyHomePage> {
-  final _eyedidFlutterPlugin = EyedidFlutter();
+  final _gazeService = GazeTrackerService();
   var _hasCameraPermission = false;
   var _isInitialied = false;
   final _licenseKey = "dev_pfst1u7ac35i0k94ia0crcapirnrjrznalqb92bu";
@@ -65,15 +69,13 @@ class _MyHomePageState extends State<MyHomePage> {
   var _showingGaze = false;
   var _isCaliMode = false;
 
-  StreamSubscription<dynamic>? _trackingEventSubscription;
-  StreamSubscription<dynamic>? _dropEventSubscription;
-  StreamSubscription<dynamic>? _statusEventSubscription;
-  StreamSubscription<dynamic>? _calibrationEventSubscription;
-
   var _x = 0.0, _y = 0.0;
   Color _gazeColor = Colors.red;
   var _nextX = 0.0, _nextY = 0.0, _calibrationProgress = 0.0;
   late var _dotSize = 10.0;
+
+  StreamSubscription<dynamic>? _gazeSubscription;
+  StreamSubscription<dynamic>? _calibrationSubscription;
 
   @override
   void initState() {
@@ -81,12 +83,20 @@ class _MyHomePageState extends State<MyHomePage> {
     initPlatformState();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 컨텍스트를 안전하게 업데이트 (빌드 프로세스 이후에 실행됨)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _gazeService.updateContext(context);
+    });
+  }
+
   Future<void> checkCameraPermission() async {
-    _hasCameraPermission = await _eyedidFlutterPlugin.checkCameraPermission();
+    _hasCameraPermission = await _gazeService.checkCameraPermission();
 
     if (!_hasCameraPermission) {
-      _hasCameraPermission =
-          await _eyedidFlutterPlugin.requestCameraPermission();
+      _hasCameraPermission = await _gazeService.requestCameraPermission();
     }
 
     if (!mounted) {
@@ -98,13 +108,12 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     await checkCameraPermission();
     if (_hasCameraPermission) {
       String platformVersion;
       try {
-        platformVersion = await _eyedidFlutterPlugin.getPlatformVersion();
+        platformVersion = await _gazeService.getPlatformVersion();
       } on PlatformException catch (error) {
         print(error);
         platformVersion = 'Failed to get platform version.';
@@ -119,130 +128,60 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> initEyedidPlugin() async {
-    String requestInitGazeTracker = "failed Request";
-    try {
-      final options = GazeTrackerOptionsBuilder()
-          .setPreset(CameraPreset.vga640x480)
-          .setUseGazeFilter(true)
-          .setUseBlink(false)
-          .setUseUserStatus(false)
-          .build();
-      final result = await _eyedidFlutterPlugin.initGazeTracker(
-          licenseKey: _licenseKey, options: options);
-      var enable = false;
-      var showGaze = false;
-      if (result.result) {
-        enable = true;
-        listenEvents();
-        _eyedidFlutterPlugin.startTracking();
-      } else if (result.message == InitializedResult.isAlreadyAttempting ||
-          result.message == InitializedResult.gazeTrackerAlreadyInitialized) {
-        enable = true;
-        listenEvents();
-        final isTracking = await _eyedidFlutterPlugin.isTracking();
-        if (isTracking) {
-          showGaze = true;
-        }
+    final initialized =
+        await _gazeService.initialize(_licenseKey, context: context);
+
+    if (initialized) {
+      final isTracking = await _gazeService.isTrackingNow();
+
+      if (!isTracking) {
+        await _gazeService.startTracking();
       }
-      setState(() {
-        _isInitialied = enable;
-        _stateString = "${result.result} : (${result.message})";
-        _showingGaze = showGaze;
+
+      // 시선 위치 업데이트를 위한 구독
+      _gazeSubscription = _gazeService.gazePositionStream.listen((data) {
+        if (mounted) {
+          setState(() {
+            _x = data['x'];
+            _y = data['y'];
+            _gazeColor = data['color'];
+            _dotSize = data['size'];
+            _showingGaze = data['isTracking'];
+          });
+        }
       });
-    } on PlatformException catch (e) {
-      requestInitGazeTracker = "Occur PlatformException (${e.message})";
+
+      // 캘리브레이션 상태 업데이트를 위한 구독
+      _calibrationSubscription = _gazeService.calibrationStream.listen((data) {
+        if (mounted) {
+          setState(() {
+            _isCaliMode = data['isCalibrationMode'];
+            _nextX = data['nextX'];
+            _nextY = data['nextY'];
+            _calibrationProgress = data['progress'];
+          });
+        }
+      });
+
       setState(() {
-        _stateString = requestInitGazeTracker;
+        _isInitialied = true;
+        _stateString = "Initialized and tracking";
+      });
+    } else {
+      setState(() {
+        _stateString = "Failed to initialize";
       });
     }
-  }
-
-  void listenEvents() {
-    _trackingEventSubscription?.cancel();
-    _dropEventSubscription?.cancel();
-    _statusEventSubscription?.cancel();
-    _calibrationEventSubscription?.cancel();
-    _trackingEventSubscription =
-        _eyedidFlutterPlugin.getTrackingEvent().listen((event) {
-      final info = MetricsInfo(event);
-      if (info.gazeInfo.trackingState == TrackingState.success) {
-        setState(() {
-          _x = info.gazeInfo.gaze.x;
-          _y = info.gazeInfo.gaze.y;
-          _gazeColor = Colors.blueAccent;
-          _dotSize = 20.0;
-
-          // Overlay를 통해 모든 화면에서 원 표시
-          GazeOverlay.show(context, _x, _y, _gazeColor);
-        });
-      } else {
-        setState(() {
-          _gazeColor = Colors.redAccent;
-          _dotSize = 20.0;
-          // ❌ 실패한 경우 Overlay 제거 (점이 남지 않도록)
-          GazeOverlay.remove();
-        });
-      }
-    });
-
-    _dropEventSubscription =
-        _eyedidFlutterPlugin.getDropEvent().listen((event) {
-      final info = DropInfo(event);
-      debugPrint("Dropped at timestamp: ${info.timestamp}");
-    });
-
-    _statusEventSubscription =
-        _eyedidFlutterPlugin.getStatusEvent().listen((event) {
-      final info = StatusInfo(event);
-      if (info.type == StatusType.start) {
-        setState(() {
-          _stateString = "start Tracking";
-          _showingGaze = true;
-        });
-      } else {
-        setState(() {
-          _stateString = "stop Trakcing : ${info.errorType?.name}";
-          _showingGaze = false;
-        });
-      }
-    });
-
-    _calibrationEventSubscription =
-        _eyedidFlutterPlugin.getCalibrationEvent().listen((event) {
-      final info = CalibrationInfo(event);
-      if (info.type == CalibrationType.nextPoint) {
-        setState(() {
-          _nextX = info.next!.x;
-          _nextY = info.next!.y;
-          _calibrationProgress = 0.0;
-        });
-        Future.delayed(const Duration(milliseconds: 500), () {
-          _eyedidFlutterPlugin.startCollectSamples();
-        });
-      } else if (info.type == CalibrationType.progress) {
-        setState(() {
-          _calibrationProgress = info.progress!;
-        });
-      } else if (info.type == CalibrationType.finished) {
-        setState(() {
-          _isCaliMode = false;
-        });
-      } else if (info.type == CalibrationType.canceled) {
-        debugPrint("Calibration canceled ${info.data?.length}");
-        setState(() {
-          _isCaliMode = false;
-        });
-      }
-    });
   }
 
   void _trackingBtnPressed() {
     if (_isInitialied) {
       if (_trackingBtnText == "START TRACKING") {
         try {
-          _eyedidFlutterPlugin
-              .startTracking(); // Call the function to start tracking
-          _trackingBtnText = "STOP TRACKING";
+          _gazeService.startTracking();
+          setState(() {
+            _trackingBtnText = "STOP TRACKING";
+          });
         } on PlatformException catch (e) {
           setState(() {
             _stateString = "Occur PlatformException (${e.message})";
@@ -250,29 +189,26 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       } else {
         try {
-          _eyedidFlutterPlugin
-              .stopTracking(); // Call the function to stop tracking
-          _trackingBtnText = "START TRACKING";
+          _gazeService.stopTracking();
+          setState(() {
+            _trackingBtnText = "START TRACKING";
+          });
         } on PlatformException catch (e) {
           setState(() {
             _stateString = "Occur PlatformException (${e.message})";
           });
         }
       }
-      setState(() {
-        _trackingBtnText = _trackingBtnText;
-      });
     }
   }
 
   void _calibrationBtnPressed() {
-    if (_isInitialied) {
+    if (_isInitialied && _showingGaze) {
       try {
-        _eyedidFlutterPlugin.startCalibration(CalibrationMode.five,
-            usePreviousCalibration: true);
-        setState(() {
-          _isCaliMode = true;
-        });
+        _gazeService.startCalibration(
+          CalibrationMode.five,
+          usePreviousCalibration: true,
+        );
       } on PlatformException catch (e) {
         setState(() {
           _stateString = "Occur PlatformException (${e.message})";
@@ -295,20 +231,34 @@ class _MyHomePageState extends State<MyHomePage> {
                   Text('Eyedid SDK version: $_version'),
                   Text('App has CameraPermission: $_hasCameraPermissionString'),
                   Text('Eyedid initState : $_stateString'),
-                  const SizedBox(
-                      height: 20), // Adding spacing between Text and Button
+                  const SizedBox(height: 20),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              SecondScreen(x: _x, y: _y, gazeColor: _gazeColor),
+                          builder: (context) => SecondScreen(
+                            x: _x,
+                            y: _y,
+                            gazeColor: _gazeColor,
+                          ),
                         ),
                       );
                     },
                     child: const Text("SECOND SCREEN"),
+                  ),
+                  // Exercies2 화면 버튼 추가 (import 필요)
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Exercies2(),
+                        ),
+                      );
+                    },
+                    child: const Text("Exercise2"),
                   ),
                   if (_isInitialied)
                     ElevatedButton(
@@ -317,28 +267,34 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   if (_isInitialied && _showingGaze)
                     ElevatedButton(
-                        onPressed: _calibrationBtnPressed,
-                        child: const Text("START CALIBRATION"))
+                      onPressed: _calibrationBtnPressed,
+                      child: const Text("START CALIBRATION"),
+                    ),
                 ],
               ),
             ),
-          /*if (_showingGaze && !_isCaliMode)
-            TrackingPoint(
-                x: _x, y: _y, dotSize: _dotSize, gazeColor: _gazeColor),*/
           if (_isCaliMode)
             Positioned(
-                left: _nextX - 10,
-                top: _nextY - 10,
-                child: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    value: _calibrationProgress,
-                    backgroundColor: Colors.grey,
-                  ),
-                ))
+              left: _nextX - 10,
+              top: _nextY - 10,
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  value: _calibrationProgress,
+                  backgroundColor: Colors.grey,
+                ),
+              ),
+            ),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _gazeSubscription?.cancel();
+    _calibrationSubscription?.cancel();
+    super.dispose();
   }
 }

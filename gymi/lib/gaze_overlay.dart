@@ -1,29 +1,71 @@
-import 'package:eyedid_flutter_example/widgets/eye_tracking_point.dart';
+import 'package:eyedid_flutter_example/widgets/tracking_point.dart';
 import 'package:flutter/material.dart';
 
 class GazeOverlay {
-  late var dotSize = 20.0;
   static OverlayEntry? _overlayEntry;
+  static bool _isActive = false;
 
   static void show(BuildContext context, double x, double y, Color color) {
-    final overlayState = Overlay.of(context);
+    try {
+      // 오버레이 동시 접근 방지
+      if (_isActive) return;
+      _isActive = true;
 
-    // ✅ 기존 Overlay가 있으면 위치만 업데이트 (깜빡임 방지)
-    if (_overlayEntry != null) {
-      _overlayEntry!.remove();
+      // 이미 있는 오버레이 안전하게 제거
+      if (_overlayEntry != null) {
+        try {
+          _overlayEntry!.remove();
+        } catch (e) {
+          print("Safely ignoring overlay removal error: $e");
+        }
+        _overlayEntry = null;
+      }
+
+      // 새 오버레이 생성
+      _overlayEntry = OverlayEntry(
+        builder: (context) => TrackingPoint(
+          x: x,
+          y: y,
+          dotSize: 20.0,
+          gazeColor: color,
+        ),
+      );
+
+      // 오버레이 삽입 시도
+      try {
+        final overlayState = Overlay.of(context);
+        overlayState.insert(_overlayEntry!);
+      } catch (e) {
+        print("Error inserting overlay: $e");
+        _overlayEntry = null;
+      }
+
+      _isActive = false;
+    } catch (e) {
+      _isActive = false;
+      print("General overlay error: $e");
     }
-
-    _overlayEntry = OverlayEntry(
-      builder: (context) =>
-          TrackingPoint(x: x, y: y, dotSize: 20.0, gazeColor: color),
-    );
-
-    overlayState.insert(_overlayEntry!);
   }
 
-  // ✅ 필요할 때 Overlay를 제거하는 함수 추가
   static void remove() {
-    _overlayEntry?.remove();
-    _overlayEntry = null;
+    try {
+      // 오버레이 동시 접근 방지
+      if (_isActive) return;
+      _isActive = true;
+
+      if (_overlayEntry != null) {
+        try {
+          _overlayEntry!.remove();
+        } catch (e) {
+          print("Safely ignoring overlay removal error: $e");
+        }
+        _overlayEntry = null;
+      }
+
+      _isActive = false;
+    } catch (e) {
+      _isActive = false;
+      print("Error removing overlay: $e");
+    }
   }
 }
