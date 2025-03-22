@@ -1,6 +1,7 @@
 import 'package:eyedid_flutter/constants/eyedid_flutter_calibration_option.dart';
 import 'package:eyedid_flutter/events/eyedid_flutter_drop.dart';
 import 'package:eyedid_flutter/eyedid_flutter_initialized_result.dart';
+import 'package:eyedid_flutter_example/%08screens/color_select_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/second_screen.dart';
 import 'package:eyedid_flutter_example/gaze_overlay.dart';
 import 'package:flutter/material.dart';
@@ -27,8 +28,22 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false, // 디버그 배너 제거
       title: 'Gaze Tracker App',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const MyHomePage(), // ✅ Navigator가 정상 작동하도록 변경
+      theme: ThemeData(
+          scaffoldBackgroundColor: const Color(0xFF9BBEDE),
+          textTheme: const TextTheme(
+            headlineLarge: TextStyle(
+              color: Colors.white,
+              fontStyle: FontStyle.italic,
+              fontSize: 60,
+            ),
+            headlineMedium: TextStyle(
+              color: Colors.white,
+              fontStyle: FontStyle.normal,
+              fontSize: 25,
+            ),
+          ),
+          primarySwatch: Colors.blue),
+      home: const FirstScreen(), // ✅ Navigator가 정상 작동하도록 변경
     );
   }
 }
