@@ -1,7 +1,10 @@
 import 'package:eyedid_flutter/constants/eyedid_flutter_calibration_option.dart';
 import 'package:eyedid_flutter/events/eyedid_flutter_drop.dart';
 import 'package:eyedid_flutter/eyedid_flutter_initialized_result.dart';
+import 'package:eyedid_flutter_example/%08screens/calibration_screen.dart';
+import 'package:eyedid_flutter_example/%08screens/explain_view.dart';
 import 'package:eyedid_flutter_example/%08screens/second_screen.dart';
+import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
 import 'package:eyedid_flutter_example/gaze_overlay.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -187,16 +190,18 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _calibrationBtnPressed() {
+  void _calibrationBtnPressed() async {
     if (_isInitialied && _showingGaze) {
-      try {
-        _gazeService.startCalibration(
-          CalibrationMode.five,
-          usePreviousCalibration: true,
-        );
-      } on PlatformException catch (e) {
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CalibrationScreen(gazeService: _gazeService),
+        ),
+      );
+
+      if (result == true) {
         setState(() {
-          _stateString = "Occur PlatformException (${e.message})";
+          _isCaliMode = false; // 캘리브레이션 종료 후 상태 초기화
         });
       }
     }
@@ -256,19 +261,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: const Text("START CALIBRATION"),
                     ),
                 ],
-              ),
-            ),
-          if (_isCaliMode)
-            Positioned(
-              left: _nextX - 10,
-              top: _nextY - 10,
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  value: _calibrationProgress,
-                  backgroundColor: Colors.grey,
-                ),
               ),
             ),
         ],
