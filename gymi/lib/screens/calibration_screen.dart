@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 
 class CalibrationScreen extends StatefulWidget {
   final GazeTrackerService gazeService;
-
-  const CalibrationScreen({super.key, required this.gazeService});
+  final bool isVibrant;
+  const CalibrationScreen(
+      {super.key, required this.gazeService, required this.isVibrant});
 
   @override
   _CalibrationScreenState createState() => _CalibrationScreenState();
@@ -54,8 +55,8 @@ class _CalibrationScreenState extends State<CalibrationScreen> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            const BeforeGameView(), // 👉 전환할 다음 화면
+                        builder: (context) => BeforeGameView(
+                            isVibrant: widget.isVibrant), // 👉 전환할 다음 화면
                       ),
                     );
                   }
@@ -73,7 +74,8 @@ class _CalibrationScreenState extends State<CalibrationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFAEC7DF),
+      backgroundColor:
+          widget.isVibrant ? const Color(0xFFAEC7DF) : const Color(0xFFA38D7D),
       body: Stack(
         children: [
           if (isFinish)

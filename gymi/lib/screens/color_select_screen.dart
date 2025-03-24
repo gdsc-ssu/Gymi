@@ -219,6 +219,7 @@ class _ColorSelectState extends State<ColorSelectScreen> {
                           MaterialPageRoute(
                               builder: (context) => CalibrationScreen(
                                     gazeService: _gazeService,
+                                    isVibrant: isVibrant,
                                   )
                               // 예시로 secondScreen을 넣으면 수정할 것
                               ),

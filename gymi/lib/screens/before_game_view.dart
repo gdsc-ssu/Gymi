@@ -3,12 +3,14 @@ import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
 import 'package:flutter/material.dart';
 
 class BeforeGameView extends StatelessWidget {
-  const BeforeGameView({super.key});
+  final bool isVibrant;
+  const BeforeGameView({super.key, required this.isVibrant});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFAEC7DF),
+      backgroundColor:
+          isVibrant ? const Color(0xFFAEC7DF) : const Color(0xFFA38D7D),
       body: Stack(
         children: [
           Center(
@@ -57,13 +59,13 @@ class BeforeGameView extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const SettingsScreen(),
+                    builder: (context) => SettingsScreen(isVibrant: isVibrant),
                   ),
                 );
               },
               icon: const Icon(
                 Icons.menu,
-                color: Colors.grey,
+                color: Colors.black87,
                 size: 40,
               ),
             ),

@@ -4,7 +4,9 @@ import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+  final bool isVibrant;
+
+  const SettingsScreen({super.key, required this.isVibrant});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -146,6 +148,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                             builder: (context) =>
                                                 CalibrationScreen(
                                                   gazeService: _gazeService,
+                                                  isVibrant: widget.isVibrant,
                                                 )
                                             // 예시로 secondScreen을 넣으면 수정할 것
                                             ),
