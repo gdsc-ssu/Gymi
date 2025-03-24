@@ -7,6 +7,7 @@ import 'package:eyedid_flutter_example/gaze_overlay.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:eyedid_flutter_example/%08screens/exercise2.dart';
+import 'package:eyedid_flutter_example/%08screens/exercise2_intro.dart';
 
 import 'package:flutter/services.dart';
 import 'package:eyedid_flutter/gaze_tracker_options.dart';
@@ -34,16 +35,17 @@ class MyApp extends StatelessWidget {
             headlineLarge: TextStyle(
               color: Colors.white,
               fontStyle: FontStyle.italic,
-              fontSize: 60,
+              fontSize: 120,
             ),
             headlineMedium: TextStyle(
               color: Colors.white,
               fontStyle: FontStyle.normal,
-              fontSize: 25,
+              fontSize: 60,
             ),
           ),
           primarySwatch: Colors.blue),
-      home: const FirstScreen(), // ✅ Navigator가 정상 작동하도록 변경
+      // 첫 화면을 Exercise2IntroScreen으로 변경
+      home: const Exercise2IntroScreen(),
     );
   }
 }
