@@ -1,3 +1,5 @@
+import 'package:eyedid_flutter_example/%08screens/calibration_screen.dart';
+import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -9,7 +11,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool isBackgroundMusicEnabled = true;
-
+  final _gazeService = GazeTrackerService();
   void toggleBackgroundMusic(bool value) {
     setState(() {
       isBackgroundMusicEnabled = value;
@@ -49,7 +51,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   height: 173,
                 ),
                 Container(
-                  width: 600,
+                  width: 650,
                   height: 500,
                   padding: const EdgeInsets.fromLTRB(110, 0, 0, 0),
                   decoration: BoxDecoration(
@@ -61,7 +63,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const SizedBox(height: 20),
                       // Settings container
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.fromLTRB(40, 40, 75, 60),
                         decoration: BoxDecoration(
                           color: Colors.grey[700],
                           borderRadius: BorderRadius.circular(16),
@@ -118,36 +120,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ),
                                 ),
                                 IconButton(
-                                  icon: const Icon(
-                                    Icons.keyboard_arrow_right_outlined,
-                                    color: Colors.white70,
-                                    size: 40,
-                                  ),
-                                  onPressed: () {
-                                    // Show info about calibration
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                        title: const Text(
-                                            'Eye Tracking Calibration Info'),
-                                        content: const Text(
-                                            'Eye tracking calibration helps improve accuracy of the eye tracking system. '
-                                            'It should be performed in the same lighting conditions you normally use the app in.'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context),
-                                            child: const Text('Got it'),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
+                                    icon: const Icon(
+                                      Icons.keyboard_arrow_right_outlined,
+                                      color: Colors.white70,
+                                      size: 40,
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                CalibrationScreen(
+                                                  gazeService: _gazeService,
+                                                )
+                                            // 예시로 secondScreen을 넣으면 수정할 것
+                                            ),
+                                      );
+                                    }),
                               ],
                             ),
                           ],
                         ),
+                      ),
+                      const SizedBox(
+                        height: 20,
                       ),
                     ],
                   ),
@@ -168,6 +164,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // Pop the current screen
                 Navigator.of(context).pop();
               },
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomRight, // 👉 오른쪽 정렬
+            child: ClipRect(
+              child: Image.asset(
+                'assets/images/Settings.png', // ✅ PNG 이미지 경로
+                fit: BoxFit.fitHeight, // ✅ 화면 크기에 맞춰 자연스럽게 채우기
+                width: 950,
+                height: 250,
+              ),
             ),
           ),
         ],
