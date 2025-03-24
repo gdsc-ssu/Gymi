@@ -1,4 +1,5 @@
 import 'package:eyedid_flutter_example/%08screens/exercise2.dart';
+import 'package:eyedid_flutter_example/%08screens/second_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -49,8 +50,8 @@ class BeforeGameView extends StatelessWidget {
             ),
           ),
           Positioned(
-            right: 30,
-            top: 30,
+            right: 50,
+            top: 50,
             child: IconButton(
               onPressed: () {
                 //설정 화면으로 이동
@@ -70,20 +71,20 @@ class BeforeGameView extends StatelessWidget {
           ),
           Positioned(
             right: 20,
-            top: MediaQuery.of(context).size.height / 2 - 20, // 화면 중앙 정렬
-            child: IconButton(
-              onPressed: () {
+            top: MediaQuery.of(context).size.height / 2 - 85, // 화면 중앙 정렬
+            child: GestureDetector(
+              onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const Exercies2(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const Exercies2()
+                      // 예시로 secondScreen을 넣으면 수정할 것
+                      ),
                 );
               },
-              icon: const Icon(
-                Icons.chevron_right, // ▶ 아이콘
-                color: Colors.white,
-                size: 50,
+              child: Image.asset(
+                'assets/images/Vector.png',
+                height: 170,
+                width: 50,
               ),
             ),
           ),

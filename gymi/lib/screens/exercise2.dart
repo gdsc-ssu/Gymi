@@ -4,7 +4,6 @@ import 'package:eyedid_flutter/events/eyedid_flutter_metrics.dart';
 import 'package:eyedid_flutter/events/eyedid_flutter_status.dart';
 import 'package:eyedid_flutter/eyedid_flutter.dart';
 import '../service/gaze_tracker_service.dart';
-import 'package:eyedid_flutter_example/gaze_overlay.dart';
 
 class Exercies2 extends StatefulWidget {
   const Exercies2({super.key});
