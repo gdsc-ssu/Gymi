@@ -1,5 +1,4 @@
 import 'package:eyedid_flutter_example/%08screens/exercise2.dart';
-import 'package:eyedid_flutter_example/%08screens/second_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
 import 'package:flutter/material.dart';
 

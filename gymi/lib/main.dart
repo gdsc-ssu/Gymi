@@ -1,12 +1,10 @@
 import 'package:eyedid_flutter/constants/eyedid_flutter_calibration_option.dart';
 import 'package:eyedid_flutter/events/eyedid_flutter_drop.dart';
 import 'package:eyedid_flutter/eyedid_flutter_initialized_result.dart';
-<<<<<<< HEAD
+import 'package:eyedid_flutter_example/%08screens/before_game_view.dart';
+
 import 'package:eyedid_flutter_example/%08screens/calibration_screen.dart';
-import 'package:eyedid_flutter_example/%08screens/explain_view.dart';
-=======
 import 'package:eyedid_flutter_example/%08screens/color_select_screen.dart';
->>>>>>> main
 import 'package:eyedid_flutter_example/%08screens/second_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
 import 'package:eyedid_flutter_example/gaze_overlay.dart';
@@ -49,7 +47,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
           primarySwatch: Colors.blue),
-      home: const FirstScreen(), // ✅ Navigator가 정상 작동하도록 변경
+      home: const ColorSelectScreen(), // ✅ Navigator가 정상 작동하도록 변경
     );
   }
 }
