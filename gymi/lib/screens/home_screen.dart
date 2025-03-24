@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class HomeScreen extends StatelessWidget {
   final bool isVibrant;
   const HomeScreen({super.key, required this.isVibrant});
-  // widget.isVibrant ? const Color(0xFFAEC7DF) 파랑 : const Color(0xFFA38D7D) 갈색
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -11,16 +11,16 @@ class HomeScreen extends StatelessWidget {
         children: [
           isVibrant
               ?
-              // 배경 : 하늘색 배경
+              // 배경
               Image.asset(
                   'assets/images/HomeScreen1.png',
-                  fit: BoxFit.cover, // ✅ fill은 왜곡될 수 있으니 cover 추천
+                  fit: BoxFit.cover,
                   width: double.infinity,
                   height: double.infinity,
                 )
               : Image.asset(
                   'assets/images/HomeScreen2.png',
-                  fit: BoxFit.cover, // ✅ fill은 왜곡될 수 있으니 cover 추천
+                  fit: BoxFit.cover,
                   width: double.infinity,
                   height: double.infinity,
                 ),
@@ -40,7 +40,7 @@ class HomeScreen extends StatelessWidget {
                   ),
           ),
 
-          // 오른쪽 상단의 캐릭터 (파란 새)
+          // 오른쪽 상단의 캐릭터
           Positioned(
             top: 280,
             right: 180,
@@ -50,7 +50,7 @@ class HomeScreen extends StatelessWidget {
                     width: 200,
                   )
                 : Image.asset(
-                    'assets/images/Talpidae.png', // 파란 새 캐릭터 이미지
+                    'assets/images/Talpidae.png', // 두더지 캐릭터 이미지
                     width: 200,
                   ),
           ),
