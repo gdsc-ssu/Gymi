@@ -1,7 +1,7 @@
 import 'package:eyedid_flutter/constants/eyedid_flutter_calibration_option.dart';
+import 'package:eyedid_flutter_example/%08screens/before_game_view.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:flutter/material.dart';
-import 'package:eyedid_flutter/eyedid_flutter.dart';
 
 class CalibrationScreen extends StatefulWidget {
   final GazeTrackerService gazeService;
@@ -31,24 +31,40 @@ class _CalibrationScreenState extends State<CalibrationScreen> {
         usePreviousCalibration: false,
       );
 
-      widget.gazeService.calibrationStream.listen((data) {
-        if (mounted) {
-          setState(() {
-            _nextX = data['nextX'];
-            _nextY = data['nextY'];
-            _calibrationProgress = data['progress'];
-            _isCalibrating = data['isCalibrationMode'];
-          });
-
-          // 캘리브레이션이 완료되면 화면 닫기
-          if (!_isCalibrating) {
-            // Navigator.pop(context, true); // 결과값 반환
+      widget.gazeService.calibrationStream.listen(
+        (data) {
+          if (mounted) {
             setState(() {
-              isFinish = true;
+              _nextX = data['nextX'];
+              _nextY = data['nextY'];
+              _calibrationProgress = data['progress'];
+              _isCalibrating = data['isCalibrationMode'];
             });
+
+            // 캘리브레이션이 완료되면 화면 닫기
+            if (!_isCalibrating) {
+              // Navigator.pop(context, true); // 결과값 반환
+              setState(() {
+                isFinish = true;
+              });
+              Future.delayed(
+                const Duration(seconds: 2),
+                () {
+                  if (mounted) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const BeforeGameView(), // 👉 전환할 다음 화면
+                      ),
+                    );
+                  }
+                },
+              );
+            }
           }
-        }
-      });
+        },
+      );
     } catch (e) {
       Navigator.pop(context, false); // 실패 시 false 반환
     }
