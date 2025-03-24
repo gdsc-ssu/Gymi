@@ -1,4 +1,5 @@
 import 'package:eyedid_flutter_example/%08screens/calibration_screen.dart';
+import 'package:eyedid_flutter_example/service/audio_service.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:flutter/material.dart';
 
@@ -12,11 +13,24 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool isBackgroundMusicEnabled = true;
   final _gazeService = GazeTrackerService();
+  final _audioService = AudioService();
+
   void toggleBackgroundMusic(bool value) {
     setState(() {
       isBackgroundMusicEnabled = value;
     });
     // Here you would add code to actually turn on/off background music
+    if (value) {
+      _audioService.playMusic();
+    } else {
+      _audioService.stopMusic();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    isBackgroundMusicEnabled = _audioService.isPlaying;
   }
 
   void performRecalibration() {
