@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../service/gaze_tracker_service.dart';
 import 'package:eyedid_flutter_example/%08screens/home_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class Exercies2 extends StatefulWidget {
   final bool isVibrant;
@@ -15,6 +16,7 @@ class Exercies2 extends StatefulWidget {
 
 class _Exercies2State extends State<Exercies2> with WidgetsBindingObserver {
   final _gazeService = GazeTrackerService();
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   // 현재 시선 위치
   double _x = 0.0;
@@ -103,6 +105,9 @@ class _Exercies2State extends State<Exercies2> with WidgetsBindingObserver {
     _cancelAllTimers();
     WidgetsBinding.instance.removeObserver(this);
     _screenActive = false;
+
+    // 오디오 플레이어 해제 추가
+    _audioPlayer.dispose();
 
     // 화면을 나갈 때 GazeOverlay 다시 활성화
     _gazeService.setShowOverlay(true);
@@ -210,6 +215,8 @@ class _Exercies2State extends State<Exercies2> with WidgetsBindingObserver {
       setState(() {
         _completedDirections[currentDirection] = true;
       });
+
+      _audioPlayer.play(AssetSource('audio/correct.mp3'));
 
       // 효과음 재생 또는 햅틱 피드백 추가 가능
       HapticFeedback.mediumImpact();

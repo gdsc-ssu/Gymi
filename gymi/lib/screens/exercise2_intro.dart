@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise2.dart';
 import 'package:eyedid_flutter_example/%08screens/exercise2_ready_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class Exercise2IntroScreen extends StatefulWidget {
   final bool isVibrant;
@@ -16,6 +16,8 @@ class Exercise2IntroScreen extends StatefulWidget {
 class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
   // 현재 페이지 인덱스
   int _currentPage = 0;
+
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   // 총 페이지 수
   final int _totalPages = 3;
@@ -45,7 +47,13 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
     ]);
 
     _pageController.dispose();
+    _audioPlayer.dispose();
     super.dispose();
+  }
+
+  // 세 번째 인트로 페이지에서 소리 재생 함수
+  void _playCorrectSound() {
+    _audioPlayer.play(AssetSource('audio/correct.mp3'));
   }
 
   // Exercise2ReadyScreen으로 이동
@@ -88,6 +96,10 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
               setState(() {
                 _currentPage = page;
               });
+
+              if (page == 2) {
+                _playCorrectSound();
+              }
             },
             children: [
               // 첫 번째 페이지 - 인트로
@@ -265,26 +277,28 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
     );
   }
 
-  // 세 번째 인트로 페이지 (소리 설명)
+  // 세 번째 인트로 페이지 (소리 설명) 수정
   Widget _buildThirdIntroPage() {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: const Column(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // 회색 박스 제거하고 아이콘 직접 표시
           Center(
-            child: Icon(
-              Icons.volume_up,
-              size: 160, // 기존 80의 2배
-              color: Color(0xFF3E64FF),
+            child: GestureDetector(
+              onTap: _playCorrectSound, // 클릭 시 소리 재생
+              child: const Icon(
+                Icons.volume_up,
+                size: 160,
+                color: Color(0xFF3E64FF),
+              ),
             ),
           ),
-          SizedBox(height: 40),
-          // 영어 설명 텍스트
-          Text(
-            "Until you hear this sound.",
+          const SizedBox(height: 40),
+          // 텍스트 수정
+          const Text(
+            "Until you hear this sound.\nTap the icon to hear an example.",
             style: TextStyle(
               color: Colors.white,
               fontSize: 24,
