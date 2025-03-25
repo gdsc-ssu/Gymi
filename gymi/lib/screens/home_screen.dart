@@ -1,7 +1,8 @@
 import 'dart:async';
-
+import 'package:eyedid_flutter_example/%08screens/exercise2.dart';
 import 'package:eyedid_flutter_example/%08screens/calibration_screen.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
+import 'package:eyedid_flutter_example/%08screens/exercise2_intro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -32,8 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   StreamSubscription<dynamic>? _gazeSubscription;
   StreamSubscription<dynamic>? _calibrationSubscription;
-
-  bool isVibrant = true;
 
   @override
   void initState() {
@@ -197,7 +196,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const TutorialScreen()),
+                        builder: (context) => Exercise2IntroScreen(
+                              isVibrant: widget.isVibrant,
+                            )),
                   );
                 }),
 

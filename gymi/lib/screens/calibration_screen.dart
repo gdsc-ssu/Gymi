@@ -1,5 +1,6 @@
 import 'package:eyedid_flutter/constants/eyedid_flutter_calibration_option.dart';
 import 'package:eyedid_flutter_example/%08screens/before_game_view.dart';
+import 'package:eyedid_flutter_example/%08screens/exercise2_intro.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:flutter/material.dart';
 
@@ -55,7 +56,7 @@ class _CalibrationScreenState extends State<CalibrationScreen> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => BeforeGameView(
+                        builder: (context) => Exercise2IntroScreen(
                             isVibrant: widget.isVibrant), // 👉 전환할 다음 화면
                       ),
                     );
