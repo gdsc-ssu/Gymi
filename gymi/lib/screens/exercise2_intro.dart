@@ -3,9 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 import 'package:eyedid_flutter_example/%08screens/exercise2.dart';
 import 'package:eyedid_flutter_example/%08screens/exercise2_ready_screen.dart';
+import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
 
 class Exercise2IntroScreen extends StatefulWidget {
-  const Exercise2IntroScreen({super.key});
+  final bool isVibrant;
+  const Exercise2IntroScreen({super.key, required this.isVibrant});
 
   @override
   State<Exercise2IntroScreen> createState() => _Exercise2IntroScreenState();
@@ -50,7 +52,9 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
   void _goToExercise2ReadyScreen() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const Exercise2ReadyScreen()),
+      MaterialPageRoute(
+          builder: (context) =>
+              Exercise2ReadyScreen(isVibrant: widget.isVibrant)),
     );
   }
 
@@ -71,7 +75,9 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF9BBEDE), // 하늘색 배경
+      backgroundColor: widget.isVibrant
+          ? const Color(0xFF9BBEDE) // Vibrant 모드 배경색
+          : const Color(0xFFA38D7D), // Comfort 모드 배경색
       body: Stack(
         children: [
           // 페이지 뷰
@@ -148,6 +154,28 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
                     ),
                   );
                 },
+              ),
+            ),
+          ),
+
+          // 오른쪽 상단에 설정 버튼 추가
+          Positioned(
+            right: 50,
+            top: 50,
+            child: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        SettingsScreen(isVibrant: widget.isVibrant),
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.settings,
+                color: Colors.white,
+                size: 40,
               ),
             ),
           ),

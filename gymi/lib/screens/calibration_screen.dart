@@ -56,8 +56,8 @@ class _CalibrationScreenState extends State<CalibrationScreen> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            const Exercise2IntroScreen(), // 👉 전환할 다음 화면
+                        builder: (context) => Exercise2IntroScreen(
+                            isVibrant: widget.isVibrant), // 👉 전환할 다음 화면
                       ),
                     );
                   }

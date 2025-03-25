@@ -34,8 +34,6 @@ class _HomeScreenState extends State<HomeScreen> {
   StreamSubscription<dynamic>? _gazeSubscription;
   StreamSubscription<dynamic>? _calibrationSubscription;
 
-  bool isVibrant = true;
-
   @override
   void initState() {
     // TODO: implement initState
@@ -198,7 +196,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const Exercise2IntroScreen()),
+                        builder: (context) => Exercise2IntroScreen(
+                              isVibrant: widget.isVibrant,
+                            )),
                   );
                 }),
 

@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../service/gaze_tracker_service.dart';
 import 'package:eyedid_flutter_example/%08screens/home_screen.dart';
+import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
 
 class Exercies2 extends StatefulWidget {
-  const Exercies2({super.key});
+  final bool isVibrant;
+  const Exercies2({super.key, this.isVibrant = true});
 
   @override
   State<Exercies2> createState() => _Exercies2State();
@@ -251,6 +253,9 @@ class _Exercies2State extends State<Exercies2> with WidgetsBindingObserver {
       _showCompletionMessage = true;
     });
 
+    // 완료 시 오버레이 모두 제거
+    _gazeService.setShowOverlay(false);
+
     // 3초 후 자동으로 홈 화면으로 이동
     _homeNavigationTimer = Timer(const Duration(seconds: 3), () {
       if (mounted && _screenActive) {
@@ -258,8 +263,7 @@ class _Exercies2State extends State<Exercies2> with WidgetsBindingObserver {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                const HomeScreen(isVibrant: true), // isVibrant 값 설정
+            builder: (context) => HomeScreen(isVibrant: widget.isVibrant),
           ),
         );
       }
@@ -298,7 +302,9 @@ class _Exercies2State extends State<Exercies2> with WidgetsBindingObserver {
         _screenActive = false;
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF9BBEDE), // 하늘색 배경
+        backgroundColor: widget.isVibrant
+            ? const Color(0xFF9BBEDE) // Vibrant 모드 배경색
+            : const Color(0xFFA38D7D), // Comfort 모드 배경색
         body: Stack(
           children: [
             // 중앙에 방향 아이콘 또는 완료 메시지
@@ -348,34 +354,29 @@ class _Exercies2State extends State<Exercies2> with WidgetsBindingObserver {
                         ),
             ),
 
-            // 오른쪽 상단에 건너뛰기 버튼
+            // 오른쪽 상단에 설정 버튼 추가
             Positioned(
-              right: 40,
-              top: 40,
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pop();
-                },
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: const Text(
-                    "SKIP",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
+              right: 50,
+              top: 50,
+              child: IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          SettingsScreen(isVibrant: widget.isVibrant),
                     ),
-                  ),
+                  );
+                },
+                icon: const Icon(
+                  Icons.settings,
+                  color: Colors.white,
+                  size: 40,
                 ),
               ),
             ),
 
-            // 왼쪽 상단에 초점 표시 토글 버튼 추가
+            // 왼쪽 상단에 초점 표시 토글 버튼
             Positioned(
               left: 40,
               top: 40,

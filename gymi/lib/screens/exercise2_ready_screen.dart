@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:eyedid_flutter_example/%08screens/exercise2.dart';
+import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
 
 class Exercise2ReadyScreen extends StatefulWidget {
-  const Exercise2ReadyScreen({super.key});
+  final bool isVibrant;
+  const Exercise2ReadyScreen({super.key, this.isVibrant = true});
 
   @override
   State<Exercise2ReadyScreen> createState() => _Exercise2ReadyScreenState();
@@ -25,7 +27,9 @@ class _Exercise2ReadyScreenState extends State<Exercise2ReadyScreen> {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const Exercies2()),
+          MaterialPageRoute(
+            builder: (context) => Exercies2(isVibrant: widget.isVibrant),
+          ),
         );
       }
     });
@@ -40,7 +44,9 @@ class _Exercise2ReadyScreenState extends State<Exercise2ReadyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF9BBEDE), // 이미지와 같은 하늘색 배경
+      backgroundColor: widget.isVibrant
+          ? const Color(0xFF9BBEDE) // Vibrant 모드 배경색
+          : const Color(0xFFA38D7D), // Comfort 모드 배경색
       body: Stack(
         children: [
           // 중앙 텍스트
@@ -96,6 +102,28 @@ class _Exercise2ReadyScreenState extends State<Exercise2ReadyScreen> {
             ),
           ),
 
+          // 오른쪽 상단에 설정 버튼 추가
+          Positioned(
+            right: 50,
+            top: 50,
+            child: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        SettingsScreen(isVibrant: widget.isVibrant),
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.settings,
+                color: Colors.white,
+                size: 40,
+              ),
+            ),
+          ),
+
           // 오른쪽 하단에 건너뛰기 버튼 (즉시 Exercise2로 이동)
           Positioned(
             right: 40,
@@ -104,7 +132,10 @@ class _Exercise2ReadyScreenState extends State<Exercise2ReadyScreen> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const Exercies2()),
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        Exercies2(isVibrant: widget.isVibrant),
+                  ),
                 );
               },
               child: Container(
