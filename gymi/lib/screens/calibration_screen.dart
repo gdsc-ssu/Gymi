@@ -2,6 +2,7 @@ import 'package:eyedid_flutter/constants/eyedid_flutter_calibration_option.dart'
 import 'package:eyedid_flutter_example/%08screens/before_game_view.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CalibrationScreen extends StatefulWidget {
   final GazeTrackerService gazeService;
@@ -79,19 +80,20 @@ class _CalibrationScreenState extends State<CalibrationScreen> {
       body: Stack(
         children: [
           if (isFinish)
-            const Center(
+            Center(
               child: Text(
                 "Calibration Successfully Completed !",
-                style: TextStyle(
-                  fontSize: 64,
-                  color: Colors.white,
-                ),
+                style: GoogleFonts.robotoSlab(
+                    color: Colors.white,
+                    fontSize: 64,
+                    fontStyle: FontStyle.normal,
+                    fontWeight: FontWeight.w400),
               ),
             ),
           if (!isFinish)
-            const Column(
+            Column(
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 600,
                 ),
                 Column(
@@ -101,20 +103,19 @@ class _CalibrationScreenState extends State<CalibrationScreen> {
                       children: [
                         Text(
                           "Focus on",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 50,
-                            fontStyle: FontStyle.normal,
-                          ),
+                          style: GoogleFonts.robotoSlab(
+                              color: Colors.white,
+                              fontSize: 64,
+                              fontStyle: FontStyle.normal,
+                              fontWeight: FontWeight.w200),
                         ),
                         Text(
                           " This dot",
-                          style: TextStyle(
-                            fontSize: 50,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontStyle: FontStyle.normal,
-                          ),
+                          style: GoogleFonts.robotoSlab(
+                              color: Colors.white,
+                              fontSize: 64,
+                              fontStyle: FontStyle.normal,
+                              fontWeight: FontWeight.w400),
                         )
                       ],
                     ),
@@ -123,20 +124,19 @@ class _CalibrationScreenState extends State<CalibrationScreen> {
                       children: [
                         Text(
                           "until it is",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 50,
-                            fontStyle: FontStyle.normal,
-                          ),
+                          style: GoogleFonts.robotoSlab(
+                              color: Colors.white,
+                              fontSize: 64,
+                              fontStyle: FontStyle.normal,
+                              fontWeight: FontWeight.w200),
                         ),
                         Text(
                           " colored fully",
-                          style: TextStyle(
-                            color: Colors.yellow,
-                            fontSize: 50,
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.normal,
-                          ),
+                          style: GoogleFonts.robotoSlab(
+                              color: Colors.yellow,
+                              fontSize: 64,
+                              fontStyle: FontStyle.normal,
+                              fontWeight: FontWeight.w400),
                         ),
                       ],
                     ),

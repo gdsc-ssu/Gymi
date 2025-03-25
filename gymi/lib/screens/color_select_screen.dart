@@ -5,6 +5,7 @@ import 'package:eyedid_flutter_example/%08screens/home_screen.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ColorSelectScreen extends StatefulWidget {
   const ColorSelectScreen({super.key});
@@ -51,36 +52,18 @@ class _ColorSelectState extends State<ColorSelectScreen> {
                         ),
                         Text(
                           "Choose a color mode for",
-                          style: TextStyle(
-                            color: Theme.of(context)
-                                .textTheme
-                                .headlineLarge!
-                                .color,
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .headlineLarge!
-                                .fontSize,
-                            fontStyle: Theme.of(context)
-                                .textTheme
-                                .headlineLarge!
-                                .fontStyle,
-                          ),
+                          style: GoogleFonts.roboto(
+                              color: Colors.white,
+                              fontSize: 60,
+                              fontWeight: FontWeight.w200),
                         ),
                         Text(
                           " your experience",
-                          style: TextStyle(
-                            color: Theme.of(context)
-                                .textTheme
-                                .headlineLarge!
-                                .color,
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .headlineLarge!
-                                .fontSize,
-                            fontStyle: Theme.of(context)
-                                .textTheme
-                                .headlineLarge!
-                                .fontStyle,
+                          style: GoogleFonts.roboto(
+                            color: Colors.white,
+                            fontSize: 60,
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.w300,
                           ),
                         ),
                       ],
@@ -243,10 +226,10 @@ class _ColorSelectState extends State<ColorSelectScreen> {
                           child: Center(
                             child: Text(
                               'Vibrant Mode',
-                              style: TextStyle(
+                              style: GoogleFonts.roboto(
                                 color: isVibrant ? Colors.blue : Colors.grey,
-                                fontWeight: FontWeight.normal,
                                 fontSize: 30,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
@@ -279,11 +262,11 @@ class _ColorSelectState extends State<ColorSelectScreen> {
                           child: Center(
                             child: Text(
                               'Comfort Mode',
-                              style: TextStyle(
-                                  color:
-                                      !isVibrant ? Colors.brown : Colors.grey,
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 30),
+                              style: GoogleFonts.roboto(
+                                color: !isVibrant ? Colors.brown : Colors.grey,
+                                fontSize: 30,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),

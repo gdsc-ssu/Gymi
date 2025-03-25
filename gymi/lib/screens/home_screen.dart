@@ -4,6 +4,7 @@ import 'package:eyedid_flutter_example/%08screens/calibration_screen.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool isVibrant;
@@ -192,8 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Tutorial 버튼
-                _buildMenuButton(context, 'Tutorial', const Color(0xFF333333),
-                    FontWeight.bold, () {
+                _buildMenuButton(context, 'Tutorial', () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -204,8 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 20),
 
                 // Calibrate 버튼
-                _buildMenuButton(
-                    context, 'Calibrate', Colors.grey, FontWeight.normal, () {
+                _buildMenuButton(context, 'Calibrate', () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -220,9 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 20),
 
                 // Start exercise 버튼
-                _buildMenuButton(
-                    context, 'Start exercise', Colors.grey, FontWeight.normal,
-                    () {
+                _buildMenuButton(context, 'Start exercise', () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -238,18 +235,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // 메뉴 버튼 위젯
-  Widget _buildMenuButton(BuildContext context, String text, Color textColor,
-      FontWeight fontWeight, VoidCallback onTap) {
+  Widget _buildMenuButton(
+      BuildContext context, String text, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
-      child: Text(
-        text,
-        style: TextStyle(
-          color: textColor,
-          fontSize: 48,
-          fontWeight: fontWeight,
-        ),
-      ),
+      child: Text(text,
+          style: GoogleFonts.robotoSlab(
+              color: Colors.black,
+              fontSize: 48,
+              fontStyle: FontStyle.normal,
+              fontWeight: FontWeight.w200)),
     );
   }
 }
@@ -290,7 +285,14 @@ class ExerciseScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Exercise Screen', style: TextStyle(fontSize: 24)),
+            Text(
+              'Exercise Screen',
+              style: GoogleFonts.robotoSlab(
+                  color: Colors.white,
+                  fontSize: 48,
+                  fontStyle: FontStyle.normal,
+                  fontWeight: FontWeight.w200),
+            ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
