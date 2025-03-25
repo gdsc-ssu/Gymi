@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
           primarySwatch: Colors.blue),
-      // 첫 화면을 Exercise2IntroScreen으로 변경
+      // 첫 화면을 Exercise2IntroScreen으로 유지
       home: const Exercise2IntroScreen(),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 import 'package:eyedid_flutter_example/%08screens/exercise2.dart';
+import 'package:eyedid_flutter_example/%08screens/exercise2_ready_screen.dart';
 
 class Exercise2IntroScreen extends StatefulWidget {
   const Exercise2IntroScreen({super.key});
@@ -45,16 +46,16 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
     super.dispose();
   }
 
-  // Exercise2로 이동
-  void _goToExercise2() {
+  // Exercise2ReadyScreen으로 이동
+  void _goToExercise2ReadyScreen() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const Exercies2()),
+      MaterialPageRoute(builder: (context) => const Exercise2ReadyScreen()),
     );
   }
 
-  // 다음 페이지로 이동 또는 Exercise2로 이동
-  void _goToNextPageOrExercise2() {
+  // 다음 페이지로 이동 또는 Exercise2ReadyScreen으로 이동
+  void _goToNextPageOrExercise2ReadyScreen() {
     if (_currentPage < _totalPages - 1) {
       // 아직 마지막 페이지가 아니면 다음 페이지로 이동
       _pageController.nextPage(
@@ -62,8 +63,8 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      // 마지막 페이지라면 Exercise2로 이동
-      _goToExercise2();
+      // 마지막 페이지라면 Exercise2ReadyScreen으로 이동
+      _goToExercise2ReadyScreen();
     }
   }
 
@@ -123,7 +124,8 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
             right: 40,
             top: MediaQuery.of(context).size.height / 2 - 85,
             child: GestureDetector(
-              onTap: _goToNextPageOrExercise2, // 다음 페이지 또는 Exercise2로 이동
+              onTap:
+                  _goToNextPageOrExercise2ReadyScreen, // 다음 페이지 또는 Exercise2ReadyScreen으로 이동
               child: Image.asset(
                 'assets/images/Vector.png',
                 height: 170,
@@ -169,7 +171,7 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
               text: const TextSpan(
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 30,
+                  fontSize: 100,
                   fontWeight: FontWeight.w300,
                 ),
                 children: [
@@ -213,19 +215,19 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
                 print('Lottie 로드 에러: $error');
                 return const Icon(
                   Icons.remove_red_eye,
-                  size: 300,
+                  size: 300, // 기존 80의 2배
                   color: Color(0xFF3E64FF),
                 );
               },
             ),
           ),
-          const SizedBox(height: 150),
+          const SizedBox(height: 100),
           // 영어 설명 텍스트
           const Text(
             "Roll your eyes to the direction of the arrow.\nStretch your eye muscle as far as you can.",
             style: TextStyle(
               color: Colors.white,
-              fontSize: 80,
+              fontSize: 100,
               fontWeight: FontWeight.w300,
             ),
             textAlign: TextAlign.center,
@@ -247,17 +249,17 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
           Center(
             child: Icon(
               Icons.volume_up,
-              size: 300,
+              size: 300, // 기존 80의 2배
               color: Color(0xFF3E64FF),
             ),
           ),
-          SizedBox(height: 150),
+          SizedBox(height: 100),
           // 영어 설명 텍스트
           Text(
             "Until you hear this sound.",
             style: TextStyle(
               color: Colors.white,
-              fontSize: 80,
+              fontSize: 100,
               fontWeight: FontWeight.w300,
             ),
             textAlign: TextAlign.center,
