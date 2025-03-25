@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:eyedid_flutter_example/%08screens/calibration_screen.dart';
+import 'package:eyedid_flutter_example/%08screens/home_screen.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,124 +14,7 @@ class ColorSelectScreen extends StatefulWidget {
 }
 
 class _ColorSelectState extends State<ColorSelectScreen> {
-  final _gazeService = GazeTrackerService();
-  var _hasCameraPermission = false;
-  var _isInitialied = false;
-  final _licenseKey = "dev_pfst1u7ac35i0k94ia0crcapirnrjrznalqb92bu";
-  var _version = 'Unknown';
-  var _stateString = "IDLE";
-  var _hasCameraPermissionString = "NO_GRANTED";
-  final _trackingBtnText = "STOP TRACKING";
-  var _showingGaze = false;
-  var _isCaliMode = false;
-
-  var _x = 0.0, _y = 0.0;
-  Color _gazeColor = Colors.red;
-  var _nextX = 0.0, _nextY = 0.0, _calibrationProgress = 0.0;
-  late var _dotSize = 10.0;
-
-  StreamSubscription<dynamic>? _gazeSubscription;
-  StreamSubscription<dynamic>? _calibrationSubscription;
-
   bool isVibrant = true;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    initPlatformState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // 컨텍스트를 안전하게 업데이트 (빌드 프로세스 이후에 실행됨)
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _gazeService.updateContext(context);
-    });
-  }
-
-  Future<void> checkCameraPermission() async {
-    _hasCameraPermission = await _gazeService.checkCameraPermission();
-
-    if (!_hasCameraPermission) {
-      _hasCameraPermission = await _gazeService.requestCameraPermission();
-    }
-
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      _hasCameraPermissionString = _hasCameraPermission ? "granted" : "denied";
-    });
-  }
-
-  Future<void> initPlatformState() async {
-    await checkCameraPermission();
-    if (_hasCameraPermission) {
-      String platformVersion;
-      try {
-        platformVersion = await _gazeService.getPlatformVersion();
-      } on PlatformException catch (error) {
-        print(error);
-        platformVersion = 'Failed to get platform version.';
-      }
-
-      if (!mounted) return;
-      initEyedidPlugin();
-      setState(() {
-        _version = platformVersion;
-      });
-    }
-  }
-
-  Future<void> initEyedidPlugin() async {
-    final initialized =
-        await _gazeService.initialize(_licenseKey, context: context);
-
-    if (initialized) {
-      final isTracking = await _gazeService.isTrackingNow();
-
-      if (!isTracking) {
-        await _gazeService.startTracking();
-      }
-
-      // 시선 위치 업데이트를 위한 구독
-      _gazeSubscription = _gazeService.gazePositionStream.listen((data) {
-        if (mounted) {
-          setState(() {
-            _x = data['x'];
-            _y = data['y'];
-            _gazeColor = data['color'];
-            _dotSize = data['size'];
-            _showingGaze = data['isTracking'];
-          });
-        }
-      });
-
-      // 캘리브레이션 상태 업데이트를 위한 구독
-      _calibrationSubscription = _gazeService.calibrationStream.listen((data) {
-        if (mounted) {
-          setState(() {
-            _isCaliMode = data['isCalibrationMode'];
-            _nextX = data['nextX'];
-            _nextY = data['nextY'];
-            _calibrationProgress = data['progress'];
-          });
-        }
-      });
-
-      setState(() {
-        _isInitialied = true;
-        _stateString = "Initialized and tracking";
-      });
-    } else {
-      setState(() {
-        _stateString = "Failed to initialize";
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -217,10 +101,8 @@ class _ColorSelectState extends State<ColorSelectScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => CalibrationScreen(
-                                    gazeService: _gazeService,
-                                    isVibrant: isVibrant,
-                                  )
+                              builder: (context) =>
+                                  HomeScreen(isVibrant: isVibrant)
                               // 예시로 secondScreen을 넣으면 수정할 것
                               ),
                         );
