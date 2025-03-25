@@ -1,15 +1,21 @@
-import 'package:eyedid_flutter_example/%08screens/second_screen.dart';
-import 'package:flutter/material.dart';
+import 'dart:async';
 
-class FirstScreen extends StatefulWidget {
-  const FirstScreen({super.key});
+import 'package:eyedid_flutter_example/%08screens/calibration_screen.dart';
+import 'package:eyedid_flutter_example/%08screens/home_screen.dart';
+import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+class ColorSelectScreen extends StatefulWidget {
+  const ColorSelectScreen({super.key});
 
   @override
-  State<FirstScreen> createState() => _FirstScreenState();
+  State<ColorSelectScreen> createState() => _ColorSelectState();
 }
 
-class _FirstScreenState extends State<FirstScreen> {
+class _ColorSelectState extends State<ColorSelectScreen> {
   bool isVibrant = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +30,7 @@ class _FirstScreenState extends State<FirstScreen> {
               child: Image.asset(
                 'assets/images/gymiBackground.png', // ✅ PNG 이미지 경로
                 fit: BoxFit.fitHeight, // ✅ 화면 크기에 맞춰 자연스럽게 채우기
-                width: 700,
+                width: 650,
                 height: 900,
               ),
             ),
@@ -95,8 +101,8 @@ class _FirstScreenState extends State<FirstScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const SecondScreen(
-                                  x: 10, y: 10, gazeColor: Colors.black)
+                              builder: (context) =>
+                                  HomeScreen(isVibrant: isVibrant)
                               // 예시로 secondScreen을 넣으면 수정할 것
                               ),
                         );
