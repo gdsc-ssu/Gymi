@@ -171,7 +171,7 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
               text: const TextSpan(
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 100,
+                  fontSize: 30,
                   fontWeight: FontWeight.w300,
                 ),
                 children: [
@@ -215,20 +215,20 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
                 print('Lottie 로드 에러: $error');
                 return const Icon(
                   Icons.remove_red_eye,
-                  size: 300, // 기존 80의 2배
+                  size: 160, // 기존 80의 2배
                   color: Color(0xFF3E64FF),
                 );
               },
             ),
           ),
-          const SizedBox(height: 100),
+          const SizedBox(height: 40),
           // 영어 설명 텍스트
           const Text(
             "Roll your eyes to the direction of the arrow.\nStretch your eye muscle as far as you can.",
             style: TextStyle(
               color: Colors.white,
-              fontSize: 100,
-              fontWeight: FontWeight.w300,
+              fontSize: 24,
+              fontWeight: FontWeight.w400,
             ),
             textAlign: TextAlign.center,
           ),
@@ -249,18 +249,18 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
           Center(
             child: Icon(
               Icons.volume_up,
-              size: 300, // 기존 80의 2배
+              size: 160, // 기존 80의 2배
               color: Color(0xFF3E64FF),
             ),
           ),
-          SizedBox(height: 100),
+          SizedBox(height: 40),
           // 영어 설명 텍스트
           Text(
             "Until you hear this sound.",
             style: TextStyle(
               color: Colors.white,
-              fontSize: 100,
-              fontWeight: FontWeight.w300,
+              fontSize: 24,
+              fontWeight: FontWeight.w400,
             ),
             textAlign: TextAlign.center,
           ),

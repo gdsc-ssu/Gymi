@@ -1,4 +1,5 @@
 import 'package:eyedid_flutter_example/%08screens/second_screen.dart';
+import 'package:eyedid_flutter_example/%08screens/exercise2_intro.dart';
 import 'package:flutter/material.dart';
 
 class FirstScreen extends StatefulWidget {
@@ -50,10 +51,8 @@ class _FirstScreenState extends State<FirstScreen> {
                                 .textTheme
                                 .headlineLarge!
                                 .color,
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .headlineLarge!
-                                .fontSize,
+                            // 글자 크기 축소
+                            fontSize: 45,
                             fontStyle: Theme.of(context)
                                 .textTheme
                                 .headlineLarge!
@@ -67,10 +66,8 @@ class _FirstScreenState extends State<FirstScreen> {
                                 .textTheme
                                 .headlineLarge!
                                 .color,
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .headlineLarge!
-                                .fontSize,
+                            // 글자 크기 축소
+                            fontSize: 45,
                             fontStyle: Theme.of(context)
                                 .textTheme
                                 .headlineLarge!
@@ -128,20 +125,14 @@ class _FirstScreenState extends State<FirstScreen> {
                                   .textTheme
                                   .headlineMedium!
                                   .color,
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .headlineMedium!
-                                  .fontSize,
+                              fontSize: 22, // 글자 크기 축소
                             ),
                           ),
                           Text(
                             "Vibrant mode",
                             style: TextStyle(
                                 color: const Color(0xFFBBFF00),
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .headlineMedium!
-                                    .fontSize,
+                                fontSize: 22, // 글자 크기 축소
                                 fontWeight: isVibrant ? FontWeight.bold : null),
                           ),
                           Text(
@@ -151,10 +142,7 @@ class _FirstScreenState extends State<FirstScreen> {
                                   .textTheme
                                   .headlineMedium!
                                   .color,
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .headlineMedium!
-                                  .fontSize,
+                              fontSize: 22, // 글자 크기 축소
                             ),
                           ),
                         ],
@@ -169,20 +157,14 @@ class _FirstScreenState extends State<FirstScreen> {
                                   .textTheme
                                   .headlineMedium!
                                   .color,
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .headlineMedium!
-                                  .fontSize,
+                              fontSize: 22, // 글자 크기 축소
                             ),
                           ),
                           Text(
                             "Eye comfort mode",
                             style: TextStyle(
                                 color: const Color(0xFF43221F),
-                                fontSize: Theme.of(context)
-                                    .textTheme
-                                    .headlineMedium!
-                                    .fontSize,
+                                fontSize: 22, // 글자 크기 축소
                                 fontWeight:
                                     !isVibrant ? FontWeight.bold : null),
                           ),
@@ -193,10 +175,7 @@ class _FirstScreenState extends State<FirstScreen> {
                                   .textTheme
                                   .headlineMedium!
                                   .color,
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .headlineMedium!
-                                  .fontSize,
+                              fontSize: 22, // 글자 크기 축소
                             ),
                           ),
                         ],
@@ -206,7 +185,7 @@ class _FirstScreenState extends State<FirstScreen> {
                 ],
               ),
               const SizedBox(
-                height: 63,
+                height: 40, // 간격 축소
               ),
               Container(
                 width: 590,
@@ -240,7 +219,7 @@ class _FirstScreenState extends State<FirstScreen> {
                               style: TextStyle(
                                 color: isVibrant ? Colors.blue : Colors.grey,
                                 fontWeight: FontWeight.normal,
-                                fontSize: 30,
+                                fontSize: 24, // 글자 크기 축소
                               ),
                             ),
                           ),
@@ -277,7 +256,7 @@ class _FirstScreenState extends State<FirstScreen> {
                                   color:
                                       !isVibrant ? Colors.brown : Colors.grey,
                                   fontWeight: FontWeight.normal,
-                                  fontSize: 30),
+                                  fontSize: 24), // 글자 크기 축소
                             ),
                           ),
                         ),
@@ -285,6 +264,33 @@ class _FirstScreenState extends State<FirstScreen> {
                     ),
                   ],
                 ),
+              ),
+
+              // Exercise2 버튼 추가
+              const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const Exercise2IntroScreen(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue[700],
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  textStyle: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+                child: const Text("Eye Exercise"),
               ),
             ],
           ),

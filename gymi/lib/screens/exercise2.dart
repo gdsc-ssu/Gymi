@@ -50,14 +50,19 @@ class _Exercies2State extends State<Exercies2> with WidgetsBindingObserver {
   // 응시 판정을 위한 체류 시간 (밀리초)
   final int _dwellTime = 2000; // 2초
 
+  // 시선 추적 초점 표시 설정
+  bool _showTrackingFocus = true;
+  Color _gazeColor = Colors.blue;
+  double _dotSize = 20.0;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _setupGazeTracking();
 
-    // GazeOverlay 숨기기 (직접 화살표만 표시)
-    _gazeService.setShowOverlay(false);
+    // GazeOverlay 표시 설정 변경 (화면에 초점 표시)
+    _gazeService.setShowOverlay(true);
 
     // 화면 방향을 가로로 고정
     SystemChrome.setPreferredOrientations([
@@ -73,14 +78,19 @@ class _Exercies2State extends State<Exercies2> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _gazeService.updateContext(context);
       _screenActive = true;
+
+      // 초점 표시를 위해 오버레이 새로고침
+      if (_showTrackingFocus) {
+        _gazeService.refreshOverlay();
+      }
     });
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed && _screenActive) {
-      // 앱이 포그라운드로 돌아왔을 때 오버레이는 계속 숨김 상태 유지
-      _gazeService.setShowOverlay(false);
+      // 앱이 포그라운드로 돌아왔을 때 오버레이 표시 설정 적용
+      _gazeService.setShowOverlay(_showTrackingFocus);
     }
   }
 
@@ -117,6 +127,8 @@ class _Exercies2State extends State<Exercies2> with WidgetsBindingObserver {
         setState(() {
           _x = data['x'];
           _y = data['y'];
+          _gazeColor = data['color'];
+          _dotSize = data['size'];
         });
 
         // 시선 위치에 따른 방향 감지
@@ -262,6 +274,14 @@ class _Exercies2State extends State<Exercies2> with WidgetsBindingObserver {
     }
   }
 
+  // 초점 표시 전환
+  void _toggleTrackingFocus() {
+    setState(() {
+      _showTrackingFocus = !_showTrackingFocus;
+    });
+    _gazeService.setShowOverlay(_showTrackingFocus);
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -274,6 +294,7 @@ class _Exercies2State extends State<Exercies2> with WidgetsBindingObserver {
         body: Stack(
           children: [
             // 시선 좌표 표시 원 (단일 원으로 표시)
+            // 참고: GazeOverlay도 보이게 설정되어 있음
             Positioned(
               left: _x - 10,
               top: _y - 10,
@@ -302,7 +323,7 @@ class _Exercies2State extends State<Exercies2> with WidgetsBindingObserver {
                         Icon(
                           Icons.check_circle,
                           color: Colors.white,
-                          size: 200,
+                          size: 100,
                         ),
                         SizedBox(height: 40),
                         Text(
@@ -320,7 +341,7 @@ class _Exercies2State extends State<Exercies2> with WidgetsBindingObserver {
                       ? const Icon(
                           Icons.check_circle,
                           color: Colors.green,
-                          size: 200,
+                          size: 100,
                         )
                       : Icon(
                           _getDirectionIcon(
@@ -352,6 +373,44 @@ class _Exercies2State extends State<Exercies2> with WidgetsBindingObserver {
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
                     ),
+                  ),
+                ),
+              ),
+            ),
+
+            // 왼쪽 상단에 초점 표시 토글 버튼 추가
+            Positioned(
+              left: 40,
+              top: 40,
+              child: GestureDetector(
+                onTap: _toggleTrackingFocus,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: _showTrackingFocus
+                        ? Colors.blue.withOpacity(0.7)
+                        : Colors.grey.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        _showTrackingFocus
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        "Focus",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

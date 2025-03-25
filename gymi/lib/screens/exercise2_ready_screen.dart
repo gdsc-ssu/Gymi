@@ -53,7 +53,7 @@ class _Exercise2ReadyScreenState extends State<Exercise2ReadyScreen> {
                   text: const TextSpan(
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 100,
+                      fontSize: 40,
                       fontWeight: FontWeight.w300,
                       letterSpacing: 1.2,
                     ),
@@ -68,7 +68,7 @@ class _Exercise2ReadyScreenState extends State<Exercise2ReadyScreen> {
                   text: const TextSpan(
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 100,
+                      fontSize: 40,
                       fontWeight: FontWeight.w300,
                       letterSpacing: 1.2,
                     ),
@@ -83,7 +83,7 @@ class _Exercise2ReadyScreenState extends State<Exercise2ReadyScreen> {
                   text: const TextSpan(
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 100,
+                      fontSize: 40,
                       fontWeight: FontWeight.w300,
                       letterSpacing: 1.2,
                     ),
