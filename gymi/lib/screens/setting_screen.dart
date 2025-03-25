@@ -79,6 +79,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     fontSize: 36,
                                     fontStyle: FontStyle.normal,
                                     fontWeight: FontWeight.w300)),
+
                             const SizedBox(height: 18),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,

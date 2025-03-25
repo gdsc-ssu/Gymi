@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:eyedid_flutter_example/%08screens/exercise2.dart';
 import 'package:eyedid_flutter_example/%08screens/calibration_screen.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
+import 'package:eyedid_flutter_example/%08screens/exercise2_intro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -33,8 +35,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   StreamSubscription<dynamic>? _gazeSubscription;
   StreamSubscription<dynamic>? _calibrationSubscription;
-
-  bool isVibrant = true;
 
   @override
   void initState() {
@@ -197,7 +197,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const TutorialScreen()),
+                        builder: (context) => Exercise2IntroScreen(
+                              isVibrant: widget.isVibrant,
+                            )),
                   );
                 }),
 
@@ -293,6 +295,7 @@ class ExerciseScreen extends StatelessWidget {
                   fontStyle: FontStyle.normal,
                   fontWeight: FontWeight.w200),
             ),
+            const Text('Exercise Screen', style: TextStyle(fontSize: 24)),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
