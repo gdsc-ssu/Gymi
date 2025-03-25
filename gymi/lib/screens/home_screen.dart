@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:eyedid_flutter_example/%08screens/exercise2.dart';
 import 'package:eyedid_flutter_example/%08screens/calibration_screen.dart';
+import 'package:eyedid_flutter_example/%08screens/exercise3.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:eyedid_flutter_example/%08screens/exercise2_intro.dart';
 import 'package:flutter/material.dart';
@@ -224,8 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildMenuButton(context, 'Start exercise', () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => const ExerciseScreen()),
+                    MaterialPageRoute(builder: (context) => const Exercise3()),
                   );
                 }),
               ],
