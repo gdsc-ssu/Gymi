@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:eyedid_flutter_example/%08screens/exercise2.dart';
 import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Exercise2ReadyScreen extends StatefulWidget {
   final bool isVibrant;
@@ -56,45 +57,66 @@ class _Exercise2ReadyScreenState extends State<Exercise2ReadyScreen> {
               children: [
                 RichText(
                   textAlign: TextAlign.center,
-                  text: const TextSpan(
-                    style: TextStyle(
+                  text: TextSpan(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 40,
                       fontWeight: FontWeight.w300,
                       letterSpacing: 1.2,
                     ),
                     children: [
-                      TextSpan(text: "Let's give it a try !"),
+                      TextSpan(
+                        text: "Let's give it a try !",
+                        style: GoogleFonts.roboto(
+                            color: Colors.white,
+                            fontSize: 48,
+                            fontStyle: FontStyle.normal,
+                            fontWeight: FontWeight.w300),
+                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 30),
                 RichText(
                   textAlign: TextAlign.center,
-                  text: const TextSpan(
-                    style: TextStyle(
+                  text: TextSpan(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 40,
                       fontWeight: FontWeight.w300,
                       letterSpacing: 1.2,
                     ),
                     children: [
-                      TextSpan(text: "Look at the direction of the arrow,"),
+                      TextSpan(
+                        text: "Look at the direction of the arrow,",
+                        style: GoogleFonts.roboto(
+                            color: Colors.white,
+                            fontSize: 48,
+                            fontStyle: FontStyle.normal,
+                            fontWeight: FontWeight.w300),
+                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 30),
                 RichText(
                   textAlign: TextAlign.center,
-                  text: const TextSpan(
-                    style: TextStyle(
+                  text: TextSpan(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 40,
                       fontWeight: FontWeight.w300,
                       letterSpacing: 1.2,
                     ),
                     children: [
-                      TextSpan(text: "and hold until you hear the sound."),
+                      TextSpan(
+                        text: "and hold until you hear the sound.",
+                        style: GoogleFonts.roboto(
+                            color: Colors.white,
+                            fontSize: 48,
+                            fontStyle: FontStyle.normal,
+                            fontWeight: FontWeight.w300),
+                      ),
                     ],
                   ),
                 ),
