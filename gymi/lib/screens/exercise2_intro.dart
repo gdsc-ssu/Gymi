@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:eyedid_flutter_example/%08screens/exercise2_ready_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
@@ -208,23 +209,37 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
           children: [
             RichText(
               textAlign: TextAlign.center,
-              text: const TextSpan(
-                style: TextStyle(
+              text: TextSpan(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 30,
                   fontWeight: FontWeight.w300,
                 ),
                 children: [
-                  TextSpan(text: "Let's do a "),
                   TextSpan(
-                    text: "simple workout",
-                    style: TextStyle(
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    text: "Let's do a ",
+                    style: GoogleFonts.roboto(
+                        color: Colors.white,
+                        fontSize: 48,
+                        fontStyle: FontStyle.normal,
+                        fontWeight: FontWeight.w200),
                   ),
                   TextSpan(
-                      text: " that can might\nhelp with your eye condition."),
+                    text: "simple workout",
+                    style: GoogleFonts.roboto(
+                        color: Colors.white,
+                        fontSize: 48,
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w500),
+                  ),
+                  TextSpan(
+                    text: " that can might\nhelp with your eye condition.",
+                    style: GoogleFonts.roboto(
+                        color: Colors.white,
+                        fontSize: 48,
+                        fontStyle: FontStyle.normal,
+                        fontWeight: FontWeight.w200),
+                  ),
                 ],
               ),
             ),
@@ -263,13 +278,13 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
           ),
           const SizedBox(height: 40),
           // 영어 설명 텍스트
-          const Text(
+          Text(
             "Roll your eyes to the direction of the arrow.\nStretch your eye muscle as far as you can.",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.w400,
-            ),
+            style: GoogleFonts.roboto(
+                color: Colors.white,
+                fontSize: 48,
+                fontStyle: FontStyle.normal,
+                fontWeight: FontWeight.w300),
             textAlign: TextAlign.center,
           ),
         ],
@@ -297,13 +312,13 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
           ),
           const SizedBox(height: 40),
           // 텍스트 수정
-          const Text(
+          Text(
             "Until you hear this sound.\nTap the icon to hear an example.",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.w400,
-            ),
+            style: GoogleFonts.roboto(
+                color: Colors.white,
+                fontSize: 48,
+                fontStyle: FontStyle.normal,
+                fontWeight: FontWeight.w300),
             textAlign: TextAlign.center,
           ),
         ],
