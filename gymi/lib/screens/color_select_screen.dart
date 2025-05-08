@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:eyedid_flutter_example/%08screens/calibration_screen.dart';
+import 'package:eyedid_flutter_example/%08screens/eye_judge_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/home_screen.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:flutter/material.dart';
@@ -83,11 +84,7 @@ class _ColorSelectState extends State<ColorSelectScreen> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  HomeScreen(isVibrant: isVibrant)
-                              // 예시로 secondScreen을 넣으면 수정할 것
-                              ),
+                          MaterialPageRoute(builder: (context) => EyeJudgeScreen(isVibrant: isVibrant)),
                         );
                       },
                       child: Image.asset(
