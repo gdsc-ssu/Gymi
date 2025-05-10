@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:eyedid_flutter_example/%08screens/bad_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/good_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image/image.dart' as img;
 
 class EyeJudgeScreen extends StatefulWidget {
   final bool isVibrant;
@@ -17,6 +20,7 @@ class EyeJudgeScreen extends StatefulWidget {
 class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
   late CameraController _controller;
   bool _isReady = false;
+  final GlobalKey _guideKey = GlobalKey();
 
   @override
   void initState() {
@@ -38,34 +42,77 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
   Future<void> _takeAndSendPicture() async {
     final file = await _controller.takePicture();
 
+    // 이미지 크롭
+    final bytes = await File(file.path).readAsBytes();
+    final image = img.decodeImage(bytes);
+    if (image == null) return;
+
+    // 화면 크기
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // eye_guide.png의 위치와 크기
+    final rectTop = screenHeight / 3;
+    const rectWidth = 600.0;
+    const rectHeight = 140.0;
+    final rectLeft = (screenWidth - rectWidth) / 2;
+
+    // 카메라 프리뷰 크기
+    final previewSize = _controller.value.previewSize;
+    if (previewSize == null) return;
+
+    // 실제 이미지와 프리뷰의 비율 계산
+    final scaleX = image.width / previewSize.width;
+    final scaleY = image.height / previewSize.height;
+
+    // 프리뷰가 화면에 표시되는 비율 계산
+    final previewScale = previewSize.width / screenWidth;
+
+    // 실제 이미지에서의 크롭 영역 계산
+    final cropX = (rectLeft * previewScale * scaleX).round();
+    final cropY = (rectTop * previewScale * scaleY).round();
+    final cropWidth = (rectWidth * previewScale * scaleX).round();
+    final cropHeight = (rectHeight * previewScale * scaleY).round();
+
+    // 이미지 크롭
+    final croppedImage = img.copyCrop(
+      image,
+      x: cropX,
+      y: cropY,
+      width: cropWidth,
+      height: cropHeight,
+    );
+
+    // 크롭된 이미지 저장
+    final croppedBytes = img.encodeJpg(croppedImage);
+    final croppedFile = File('${file.path}_cropped.jpg');
+    await croppedFile.writeAsBytes(croppedBytes);
+
+    // API 요청  // TODO: api 명세 정해지면 바꾸기
     final request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://gymi.com/upload-eyes'),  // TODO: api 명세 정해지면 바꾸기
+      Uri.parse('http://gymi.com/upload-eyes'),
     );
-    request.files.add(await http.MultipartFile.fromPath('image', file.path)); // TODO: api 명세 정해지면 바꾸기
+    request.files.add(await http.MultipartFile.fromPath('image', croppedFile.path));
 
     final response = await request.send();
     final body = await response.stream.bytesToString();
     final result = jsonDecode(body);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('eyeStatus', result['eyeStatus']); // TODO: api 명세 정해지면 바꾸기
 
-    // var result = {
-    //   'eyeStatus': 'BAD', // TODO: api 명세 정해지기 전 테스트용
-    // };
+    if (!mounted) return;
 
     if (result['eyeStatus'] == 'GOOD') { // TODO: api 명세 정해지면 바꾸기
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => GoodScreen(isVibrant: widget.isVibrant), // widget.isVibrant으로 접근
+          builder: (context) => GoodScreen(isVibrant: widget.isVibrant),
         ),
       );
     } else {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => BadScreen(isVibrant: widget.isVibrant), // widget.isVibrant으로 접근
+          builder: (context) => BadScreen(isVibrant: widget.isVibrant),
         ),
       );
     }
@@ -81,31 +128,92 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
   Widget build(BuildContext context) {
     if (!_isReady) return const Center(child: CircularProgressIndicator());
 
+    final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final rectTop = screenHeight / 3;
-    const rectHeight = 150.0;
+    const rectWidth = 600.0;
+    const rectHeight = 140.0;
+    final rectLeft = (screenWidth - rectWidth) / 2;
 
     return Stack(
       children: [
         CameraPreview(_controller),
-        // 가이드 박스 (이미지로 대체 가능)
+        // 반투명한 검은색 오버레이 (가이드 영역 제외)
+        Positioned.fill(
+          child: ClipPath(
+            clipper: EyeGuideClipper(
+              guideRect: Rect.fromLTWH(
+                rectLeft,
+                rectTop,
+                rectWidth,
+                rectHeight,
+              ),
+            ),
+            child: Container(
+              color: Colors.black.withOpacity(0.34),
+            ),
+          ),
+        ),
+        // 눈 가이드 이미지
         Positioned(
           top: rectTop,
-          left: 30,
-          right: 30,
-          child: Image.asset('assets/images/eye_guide.png', height: rectHeight),
+          left: rectLeft,
+          child: Image.asset(
+            'assets/images/eye_guide.png',
+            key: _guideKey,
+            width: rectWidth,
+            height: rectHeight,
+          ),
         ),
         // 안내 텍스트
         Positioned(
-          bottom: 120,
-          left: 0,
-          right: 0,
-          child: Text(
-            "Please align your eyes within the highlighted area\nand make sure your face is well lit.",
-            style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w500),
-            textAlign: TextAlign.center,
-          ),
+            bottom: 270,
+            left: 0,
+            right: 0,
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(
+                    height: 150,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Please align your eyes within the ",
+                        style: GoogleFonts.lato(
+                            color: Colors.white,
+                            fontSize: 32,
+                            fontWeight: FontWeight.w400),
+                      ),
+                      Text(
+                        "hilighted",
+                        style: GoogleFonts.lato(
+                          color: Color(0xFFBBFF00),
+                          fontSize: 32,
+                          fontWeight: FontWeight.w400,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "area and make sure your face is well lit,",
+                        style: GoogleFonts.lato(
+                            color: Colors.white,
+                            fontSize: 32,
+                            fontWeight: FontWeight.w400
+                        ),
+                      ),
+                    ],
+                  )
+                ]
+            )
         ),
+
         // 촬영 버튼
         Positioned(
           bottom: 40,
@@ -118,26 +226,22 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
       ],
     );
   }
+}
 
-  Widget _overlayGuide(double rectTop, double rectHeight) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: Container(color: Colors.black.withOpacity(0.4)),
-        ),
-        Positioned(
-          top: rectTop,
-          left: 30,
-          right: 30,
-          child: Container(
-            height: rectHeight,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.white, width: 2),
-              color: Colors.transparent,
-            ),
-          ),
-        ),
-      ],
-    );
+class EyeGuideClipper extends CustomClipper<Path> {
+  final Rect guideRect;
+
+  EyeGuideClipper({required this.guideRect});
+
+  @override
+  Path getClip(Size size) {
+    final path = Path()
+      ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..addRect(guideRect)
+      ..fillType = PathFillType.evenOdd;
+    return path;
   }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
