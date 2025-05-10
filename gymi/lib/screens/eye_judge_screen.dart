@@ -50,6 +50,10 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('eyeStatus', result['eyeStatus']); // TODO: api 명세 정해지면 바꾸기
 
+    // var result = {
+    //   'eyeStatus': 'BAD', // TODO: api 명세 정해지기 전 테스트용
+    // };
+
     if (result['eyeStatus'] == 'GOOD') { // TODO: api 명세 정해지면 바꾸기
       Navigator.push(
         context,
@@ -81,21 +85,37 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
     final rectTop = screenHeight / 3;
     const rectHeight = 150.0;
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          CameraPreview(_controller),
-          _overlayGuide(rectTop, rectHeight),
-          Positioned(
-            bottom: 40,
-            left: MediaQuery.of(context).size.width / 2 - 30,
-            child: FloatingActionButton(
-              onPressed: _takeAndSendPicture,
-              child: const Icon(Icons.camera_alt),
-            ),
-          )
-        ],
-      ),
+    return Stack(
+      children: [
+        CameraPreview(_controller),
+        // 가이드 박스 (이미지로 대체 가능)
+        Positioned(
+          top: rectTop,
+          left: 30,
+          right: 30,
+          child: Image.asset('assets/images/eye_guide.png', height: rectHeight),
+        ),
+        // 안내 텍스트
+        Positioned(
+          bottom: 120,
+          left: 0,
+          right: 0,
+          child: Text(
+            "Please align your eyes within the highlighted area\nand make sure your face is well lit.",
+            style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w500),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        // 촬영 버튼
+        Positioned(
+          bottom: 40,
+          left: MediaQuery.of(context).size.width / 2 - 30,
+          child: GestureDetector(
+            onTap: _takeAndSendPicture,
+            child: Image.asset('assets/images/camera_btn.png', width: 60),
+          ),
+        ),
+      ],
     );
   }
 
