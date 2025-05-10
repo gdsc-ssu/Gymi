@@ -44,7 +44,10 @@ class _GoodScreenState extends State<GoodScreen> {
                 children: [
                   TextSpan(
                       text: 'Our AI model suggests that\n',
-                      style: GoogleFonts.roboto(fontSize: 64)
+                      style: GoogleFonts.roboto(
+                          fontSize: 64,
+                          fontWeight: FontWeight.w200,
+                      )
                   ),
                   TextSpan(
                     text: 'your eye alignment appears to be within the ',

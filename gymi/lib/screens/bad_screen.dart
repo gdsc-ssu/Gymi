@@ -45,7 +45,10 @@ class _BadScreenState extends State<BadScreen> {
                 children: [
                   TextSpan(
                       text: 'Our AI model has detected signs that\n',
-                      style: GoogleFonts.roboto(fontSize: 64)
+                      style: GoogleFonts.roboto(
+                          fontSize: 64,
+                          fontWeight: FontWeight.w200,
+                      )
                   ),
                   TextSpan(
                     text: 'may indicate ',
