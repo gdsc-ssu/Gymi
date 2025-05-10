@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:eyedid_flutter_example/%08screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -171,6 +172,7 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
 
     // 현재 두더지가 없는 슬롯만 선택
     for (int i = 0; i < 9; i++) {
+      if (i == 4) continue; // 중앙 슬롯은 제외
       if (!_moleVisible[i]) {
         availableSlots.add(i);
       }
@@ -210,6 +212,7 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
 
     // 각 셀에 대해 시선이 그 위에 있는지 확인
     for (int i = 0; i < 9; i++) {
+      if (i == 4) continue; // 중앙 슬롯은 제외
       if (!_moleVisible[i] || _moleGazing[i]) continue;
 
       int row = i ~/ 3;
@@ -259,18 +262,14 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final isLandscape = size.width > size.height;
     final safeArea = MediaQuery.of(context).padding;
-    
-    // 앱바 및 상태표시줄 높이를 고려한 실제 사용 가능 영역 계산
     final appBarHeight = AppBar().preferredSize.height;
     final usableHeight = size.height - appBarHeight - safeArea.top - safeArea.bottom;
-    
-    // 가로/세로 모드에 따라 그리드 최대 크기 계산
-    final gridMaxSize = isLandscape 
-        ? min(usableHeight * 0.9, size.width * 0.6) // 가로모드
-        : min(size.width * 0.95, usableHeight * 0.7); // 세로모드
-    
+    final usableWidth = size.width;
+
+    final cellWidth = usableWidth / 3;
+    final cellHeight = usableHeight / 3;
+
     return PopScope(
       canPop: true,
       onPopInvoked: (didPop) {
@@ -291,184 +290,123 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: widget.isVibrant ? [Color(0xFFAEC7DF)!, Color(0xFF88B4DD)!] : [Color(0xFFA38D7D)!, Color(0xFFA48F84)!],
+                    colors: widget.isVibrant
+                        ? [Color(0xFFB7D8F6), Color(0xFF7EB6E9)]
+                        : [Color(0xFFA38D7D), Color(0xFFA48F84)],
                   ),
                 ),
               ),
-              
-              // 메인 콘텐츠 영역 - 가로/세로 모드에 따라 레이아웃 조정
-              Column(
-                children: [
-                  // 게임 상태 표시 영역
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // 점수
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.8),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            'Score: $_score',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        
-                        // 남은 시간
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.8),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            'Remain Time: $formattedTime',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  // 게임 그리드 - 화면 크기에 맞게 조정
-                  Expanded(
-                    child: Center(
-                      child: !_isGameOver
-                        ? SizedBox(
-                            width: gridMaxSize,
-                            height: gridMaxSize,
-                            child: GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                childAspectRatio: 1.0,
-                                crossAxisSpacing: 8,
-                                mainAxisSpacing: 8,
-                              ),
-                              itemCount: 9,
-                              itemBuilder: (context, index) {
-                                return Container(
-                                  margin: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                    color: widget.isVibrant ? Color(0xFF88B4DD) : Color(0xFFA48F84),
-                                    borderRadius: BorderRadius.circular(15),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.3),
-                                        blurRadius: 5,
-                                        offset: const Offset(0, 3),
-                                      ),
-                                    ],
-                                  ),
-                                  child: _moleVisible[index]
-                                    ? Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          // 두더지 이미지
-                                          Padding(
-                                            padding: const EdgeInsets.all(4.0),
-                                            child: Image.asset(
-                                              widget.isVibrant ? 'assets/images/bird.png' : 'assets/images/mole.png',
-                                              fit: BoxFit.contain,
-                                            ),
-                                          ),
-                                          
-                                          // 응시 진행 표시기
-                                          if (_moleGazeStartTime[index] != null && !_moleGazing[index])
-                                            CircularProgressIndicator(
-                                              value: min(DateTime.now().difference(_moleGazeStartTime[index]!).inMilliseconds / 2000, 1.0),
-                                              strokeWidth: 5,
-                                              backgroundColor: Colors.grey.withOpacity(0.3),
-                                              color: Colors.green,
-                                            ),
-                                        ],
-                                      )
-                                    : Container(),
-                                );
-                              },
-                            ),
-                          )
-                        : Container(
-                            width: min(300, size.width * 0.8),
-                            padding: const EdgeInsets.all(20),
+              // 3x3 그리드 (Table)
+              Table(
+                defaultColumnWidth: FixedColumnWidth(cellWidth),
+                children: List.generate(3, (row) {
+                  return TableRow(
+                    children: List.generate(3, (col) {
+                      int index = row * 3 + col;
+                      if (index == 4) {
+                        // 중앙 슬롯: 점수/시간 표시
+                        return SizedBox(
+                          width: cellWidth,
+                          height: cellHeight,
+                          child: Container(
+                            margin: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.9),
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(15),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.3),
-                                  blurRadius: 10,
-                                  spreadRadius: 5,
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 3),
                                 ),
                               ],
                             ),
                             child: Column(
-                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Text(
-                                  'Game Over!',
+                                Text(
+                                  'Score',
                                   style: TextStyle(
-                                    fontSize: 28,
+                                    fontSize: 18,
+                                    color: Colors.grey[700],
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                const SizedBox(height: 20),
                                 Text(
-                                  'Total Score: $_score',
+                                  '$_score',
+                                  style: const TextStyle(
+                                    fontSize: 32,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  'Remain',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey[700],
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  formattedTime,
                                   style: const TextStyle(
                                     fontSize: 24,
+                                    color: Colors.black,
                                     fontWeight: FontWeight.bold,
                                   ),
-                                ),
-                                const SizedBox(height: 30),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    ElevatedButton.icon(
-                                      onPressed: () {
-                                        _startGame();
-                                      },
-                                      icon: const Icon(Icons.refresh),
-                                      label: const Text('Retry'),
-                                      style: ElevatedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                                        backgroundColor: Colors.green,
-                                        foregroundColor: Colors.white,
-                                      ),
-                                    ),
-                                    ElevatedButton.icon(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      icon: const Icon(Icons.home),
-                                      label: const Text('To Home'),
-                                      style: ElevatedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                                        backgroundColor: Colors.blue,
-                                        foregroundColor: Colors.white,
-                                      ),
-                                    ),
-                                  ],
                                 ),
                               ],
                             ),
                           ),
-                    ),
-                  ),
-                ],
+                        );
+                      } else {
+                        // 두더지 슬롯
+                        return SizedBox(
+                          width: cellWidth,
+                          height: cellHeight,
+                          child: Container(
+                            margin: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: widget.isVibrant ? Color(0xFF88B4DD) : Color(0xFFA48F84),
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.15),
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: _moleVisible[index]
+                                ? Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Image.asset(
+                                    widget.isVibrant ? 'assets/images/bird.png' : 'assets/images/mole.png',
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                                if (_moleGazeStartTime[index] != null && !_moleGazing[index])
+                                  CircularProgressIndicator(
+                                    value: min(DateTime.now().difference(_moleGazeStartTime[index]!).inMilliseconds / 2000, 1.0),
+                                    strokeWidth: 5,
+                                    backgroundColor: Colors.grey.withOpacity(0.3),
+                                    color: Colors.green,
+                                  ),
+                              ],
+                            )
+                                : Container(),
+                          ),
+                        );
+                      }
+                    }),
+                  );
+                }),
               ),
-
               // 시선 표시 점
               Positioned(
                 left: _x - 10,
@@ -489,6 +427,85 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
                   ),
                 ),
               ),
+              // 게임 종료 시 Game Over/버튼 오버레이
+              if (_isGameOver)
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.black.withOpacity(0.4),
+                    child: Center(
+                      child: Container(
+                        width: 320,
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 10,
+                              spreadRadius: 5,
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              'Game Over!',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              'Total Score: $_score',
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                ElevatedButton.icon(
+                                  onPressed: () {
+                                    _startGame();
+                                  },
+                                  icon: const Icon(Icons.refresh),
+                                  label: const Text('Retry'),
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                    backgroundColor: Colors.green,
+                                    foregroundColor: Colors.white,
+                                  ),
+                                ),
+                                ElevatedButton.icon(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => HomeScreen(isVibrant: widget.isVibrant),
+                                      ),
+                                    );
+                                  },
+                                  icon: const Icon(Icons.home),
+                                  label: const Text('To Home'),
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                    backgroundColor: Colors.blue,
+                                    foregroundColor: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
