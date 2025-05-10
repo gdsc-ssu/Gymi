@@ -2,10 +2,12 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../service/gaze_tracker_service.dart';
 
 class Exercise3 extends StatefulWidget {
-  const Exercise3({super.key});
+  final bool isVibrant;
+  const Exercise3({super.key, required this.isVibrant});
 
   @override
   State<Exercise3> createState() => _Exercise3State();
@@ -276,8 +278,8 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('두더지 잡기 게임'),
-          backgroundColor: Colors.brown[700],
+          title: Text('Catch the Animal', style: GoogleFonts.roboto(color: Colors.black)),
+          backgroundColor: widget.isVibrant ? Color(0xFF88B4DD) : Color(0xFFA48F84),
           elevation: 0,
         ),
         body: SafeArea(
@@ -289,7 +291,7 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.brown[400]!, Colors.brown[800]!],
+                    colors: widget.isVibrant ? [Color(0xFFAEC7DF)!, Color(0xFF88B4DD)!] : [Color(0xFFA38D7D)!, Color(0xFFA48F84)!],
                   ),
                 ),
               ),
@@ -311,7 +313,7 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
-                            '점수: $_score',
+                            'Score: $_score',
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -327,7 +329,7 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
-                            '남은 시간: $formattedTime',
+                            'Remain Time: $formattedTime',
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -359,7 +361,7 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
                                 return Container(
                                   margin: const EdgeInsets.all(4),
                                   decoration: BoxDecoration(
-                                    color: Colors.brown[600],
+                                    color: widget.isVibrant ? Color(0xFF88B4DD) : Color(0xFFA48F84),
                                     borderRadius: BorderRadius.circular(15),
                                     boxShadow: [
                                       BoxShadow(
@@ -377,7 +379,7 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
                                           Padding(
                                             padding: const EdgeInsets.all(4.0),
                                             child: Image.asset(
-                                              'assets/images/mole.png',
+                                              widget.isVibrant ? 'assets/images/bird.png' : 'assets/images/mole.png',
                                               fit: BoxFit.contain,
                                             ),
                                           ),
@@ -415,7 +417,7 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 const Text(
-                                  '게임 종료!',
+                                  'Game Over!',
                                   style: TextStyle(
                                     fontSize: 28,
                                     fontWeight: FontWeight.bold,
@@ -423,7 +425,7 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
                                 ),
                                 const SizedBox(height: 20),
                                 Text(
-                                  '최종 점수: $_score',
+                                  'Total Score: $_score',
                                   style: const TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
@@ -438,7 +440,7 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
                                         _startGame();
                                       },
                                       icon: const Icon(Icons.refresh),
-                                      label: const Text('다시 시작'),
+                                      label: const Text('Retry'),
                                       style: ElevatedButton.styleFrom(
                                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                                         backgroundColor: Colors.green,
@@ -450,7 +452,7 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
                                         Navigator.of(context).pop();
                                       },
                                       icon: const Icon(Icons.home),
-                                      label: const Text('홈으로'),
+                                      label: const Text('To Home'),
                                       style: ElevatedButton.styleFrom(
                                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                                         backgroundColor: Colors.blue,
