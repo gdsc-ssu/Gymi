@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:eyedid_flutter_example/%08screens/calibration_screen.dart';
+import 'package:eyedid_flutter_example/%08screens/eye_camera_explain.dart';
 import 'package:eyedid_flutter_example/%08screens/eye_judge_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/home_screen.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
@@ -84,7 +85,7 @@ class _ColorSelectState extends State<ColorSelectScreen> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => EyeJudgeScreen(isVibrant: isVibrant)),
+                          MaterialPageRoute(builder: (context) => EyeCameraExplainScreen(isVibrant: isVibrant)),
                         );
                       },
                       child: Image.asset(
