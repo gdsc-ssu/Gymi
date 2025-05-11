@@ -21,6 +21,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
   late CameraController _controller;
   bool _isReady = false;
   bool _isLoading = false;
+  String? _errorMessage;
   final GlobalKey _guideKey = GlobalKey();
 
   @override
@@ -38,6 +39,19 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
     _controller = CameraController(front, ResolutionPreset.medium);
     await _controller.initialize();
     setState(() => _isReady = true);
+  }
+
+  void _showError(String message) {
+    setState(() {
+      _errorMessage = message;
+    });
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _errorMessage = null;
+        });
+      }
+    });
   }
 
   Future<void> _takeAndSendPicture() async {
@@ -110,16 +124,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
       if (!mounted) return;
 
       if (result.containsKey('error')) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result['error']),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 3),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        _showError(result['error']);
         return;
       }
 
@@ -143,15 +148,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('오류가 발생했습니다. 다시 시도해주세요.'),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 3),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      _showError('오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -291,6 +288,32 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
                         ),
                       ),
                     ],
+                  ),
+                ),
+              ),
+            ),
+
+          // 에러 메시지
+          if (_errorMessage != null)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.5),
+                child: Center(
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 32),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      _errorMessage!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
               ),
