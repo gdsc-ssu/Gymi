@@ -9,6 +9,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image/image.dart' as img;
 
+import 'home_screen.dart';
+
 class EyeJudgeScreen extends StatefulWidget {
   final bool isVibrant;
   const EyeJudgeScreen({super.key, required this.isVibrant});
@@ -22,6 +24,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
   bool _isReady = false;
   bool _isLoading = false;
   String? _errorMessage;
+  bool _isError = false;
   final GlobalKey _guideKey = GlobalKey();
 
   @override
@@ -44,14 +47,31 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
   void _showError(String message) {
     setState(() {
       _errorMessage = message;
+      _isError = true;
     });
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         setState(() {
           _errorMessage = null;
         });
       }
     });
+  }
+
+  void _handleRetry() {
+    setState(() {
+      _isError = false;
+      _errorMessage = null;
+    });
+  }
+
+  void _handleSkip() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HomeScreen(isVibrant: widget.isVibrant),
+      ),
+    );
   }
 
   Future<void> _takeAndSendPicture() async {
@@ -174,7 +194,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
     final rectLeft = (screenWidth - rectWidth) / 2;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
           CameraPreview(_controller),
@@ -199,7 +219,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
             top: rectTop,
             left: rectLeft,
             child: Image.asset(
-              'assets/images/eye_guide.png',
+              _isError ? 'assets/images/eye_guide_error.png' : 'assets/images/eye_guide.png',
               width: rectWidth,
               height: rectHeight,
             ),
@@ -215,40 +235,77 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
                     const SizedBox(
                       height: 150,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Please align your eyes within the ",
-                          style: GoogleFonts.lato(
-                              color: Colors.white,
-                              fontSize: 32,
-                              fontWeight: FontWeight.w400),
-                        ),
-                        Text(
-                          "hilighted",
-                          style: GoogleFonts.lato(
-                            color: Color(0xFFBBFF00),
-                            fontSize: 32,
-                            fontWeight: FontWeight.w400,
-                            fontStyle: FontStyle.italic,
+                    if (!_isError) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Please align your eyes within the ",
+                            style: GoogleFonts.lato(
+                                color: Colors.white,
+                                fontSize: 32,
+                                fontWeight: FontWeight.w400),
                           ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "area and make sure your face is well lit,",
-                          style: GoogleFonts.lato(
-                              color: Colors.white,
+                          Text(
+                            "hilighted",
+                            style: GoogleFonts.lato(
+                              color: Color(0xFFBBFF00),
                               fontSize: 32,
-                              fontWeight: FontWeight.w400
+                              fontWeight: FontWeight.w400,
+                              fontStyle: FontStyle.italic,
+                            ),
                           ),
-                        ),
-                      ],
-                    )
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "area and make sure your face is well lit,",
+                            style: GoogleFonts.lato(
+                                color: Colors.white,
+                                fontSize: 32,
+                                fontWeight: FontWeight.w400
+                            ),
+                          ),
+                        ],
+                      ),
+                    ] else ...[
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(left: rectLeft),
+                            child: GestureDetector(
+                              onTap: _handleRetry,
+                              child: Text(
+                                '>     Retry',
+                                style: GoogleFonts.lato(
+                                  color: Colors.white,
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Padding(
+                            padding: EdgeInsets.only(left: rectLeft),
+                            child: GestureDetector(
+                              onTap: _handleSkip,
+                              child: Text(
+                                '>    Skip',
+                                style: GoogleFonts.lato(
+                                  color: Colors.white,
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ]
               )
           ),
@@ -295,26 +352,23 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
 
           // 에러 메시지
           if (_errorMessage != null)
-            Positioned.fill(
+            Positioned(
+              bottom: MediaQuery.of(context).size.height / 2,
+              left: MediaQuery.of(context).size.width * 0.2,
+              right: MediaQuery.of(context).size.width * 0.2,
               child: Container(
-                color: Colors.black.withOpacity(0.5),
-                child: Center(
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 32),
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      _errorMessage!,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  _errorMessage!,
+                  style: GoogleFonts.lato(
+                    color: Colors.white,
+                    fontSize: 24,
                   ),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ),
@@ -341,3 +395,4 @@ class EyeGuideClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
+
