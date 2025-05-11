@@ -88,12 +88,16 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
     final croppedFile = File('${file.path}_cropped.jpg');
     await croppedFile.writeAsBytes(croppedBytes);
 
-    // API 요청  // TODO: api 명세 정해지면 바꾸기
+    // API 요청
     final request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://gymi.com/upload-eyes'),
+      Uri.parse('https://strabismus-detector-149475634578.asia-northeast3.run.app/predict/'),
     );
-    request.files.add(await http.MultipartFile.fromPath('image', croppedFile.path));
+
+    request.files.add(await http.MultipartFile.fromPath('file', croppedFile.path));
+    request.fields['name'] = 'Gym:i';
+    request.fields['age'] = '20';
+    request.fields['sex'] = 'woman';
 
     final response = await request.send();
     final body = await response.stream.bytesToString();
@@ -101,18 +105,21 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
 
     if (!mounted) return;
 
-    if (result['eyeStatus'] == 'GOOD') { // TODO: api 명세 정해지면 바꾸기
+    final prediction = result['prediction'];
+    final isAbnormal = prediction['class'] != 'normal' && prediction['confidence'] >= 90;
+
+    if (isAbnormal) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => GoodScreen(isVibrant: widget.isVibrant),
+          builder: (context) => BadScreen(isVibrant: widget.isVibrant),
         ),
       );
     } else {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => BadScreen(isVibrant: widget.isVibrant),
+          builder: (context) => GoodScreen(isVibrant: widget.isVibrant),
         ),
       );
     }
