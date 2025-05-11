@@ -20,6 +20,7 @@ class EyeJudgeScreen extends StatefulWidget {
 class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
   late CameraController _controller;
   bool _isReady = false;
+  bool _isLoading = false;
   final GlobalKey _guideKey = GlobalKey();
 
   @override
@@ -40,88 +41,104 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
   }
 
   Future<void> _takeAndSendPicture() async {
-    final file = await _controller.takePicture();
+    setState(() => _isLoading = true);
 
-    // 이미지 크롭
-    final bytes = await File(file.path).readAsBytes();
-    final image = img.decodeImage(bytes);
-    if (image == null) return;
+    try {
+      final file = await _controller.takePicture();
 
-    // 화면 크기
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+      // 이미지 크롭
+      final bytes = await File(file.path).readAsBytes();
+      final image = img.decodeImage(bytes);
+      if (image == null) return;
 
-    // eye_guide.png의 위치와 크기
-    final rectTop = screenHeight / 3;
-    const rectWidth = 600.0;
-    const rectHeight = 140.0;
-    final rectLeft = (screenWidth - rectWidth) / 2;
+      // 화면 크기
+      final screenWidth = MediaQuery.of(context).size.width;
+      final screenHeight = MediaQuery.of(context).size.height;
 
-    // 카메라 프리뷰 크기
-    final previewSize = _controller.value.previewSize;
-    if (previewSize == null) return;
+      // eye_guide.png의 위치와 크기
+      final rectTop = screenHeight / 3;
+      const rectWidth = 600.0;
+      const rectHeight = 140.0;
+      final rectLeft = (screenWidth - rectWidth) / 2;
 
-    // 실제 이미지와 프리뷰의 비율 계산
-    final scaleX = image.width / previewSize.width;
-    final scaleY = image.height / previewSize.height;
+      // 카메라 프리뷰 크기
+      final previewSize = _controller.value.previewSize;
+      if (previewSize == null) return;
 
-    // 프리뷰가 화면에 표시되는 비율 계산
-    final previewScale = previewSize.width / screenWidth;
+      // 실제 이미지와 프리뷰의 비율 계산
+      final scaleX = image.width / previewSize.width;
+      final scaleY = image.height / previewSize.height;
 
-    // 실제 이미지에서의 크롭 영역 계산
-    final cropX = (rectLeft * previewScale * scaleX).round();
-    final cropY = (rectTop * previewScale * scaleY).round();
-    final cropWidth = (rectWidth * previewScale * scaleX).round();
-    final cropHeight = (rectHeight * previewScale * scaleY).round();
+      // 프리뷰가 화면에 표시되는 비율 계산
+      final previewScale = previewSize.width / screenWidth;
 
-    // 이미지 크롭
-    final croppedImage = img.copyCrop(
-      image,
-      x: cropX,
-      y: cropY,
-      width: cropWidth,
-      height: cropHeight,
-    );
+      // 실제 이미지에서의 크롭 영역 계산
+      final cropX = (rectLeft * previewScale * scaleX).round();
+      final cropY = (rectTop * previewScale * scaleY).round();
+      final cropWidth = (rectWidth * previewScale * scaleX).round();
+      final cropHeight = (rectHeight * previewScale * scaleY).round();
 
-    // 크롭된 이미지 저장
-    final croppedBytes = img.encodeJpg(croppedImage);
-    final croppedFile = File('${file.path}_cropped.jpg');
-    await croppedFile.writeAsBytes(croppedBytes);
+      // 이미지 크롭
+      final croppedImage = img.copyCrop(
+        image,
+        x: cropX,
+        y: cropY,
+        width: cropWidth,
+        height: cropHeight,
+      );
 
-    // API 요청
-    final request = http.MultipartRequest(
-      'POST',
-      Uri.parse('https://strabismus-detector-149475634578.asia-northeast3.run.app/predict/'),
-    );
+      // 크롭된 이미지 저장
+      final croppedBytes = img.encodeJpg(croppedImage);
+      final croppedFile = File('${file.path}_cropped.jpg');
+      await croppedFile.writeAsBytes(croppedBytes);
 
-    request.files.add(await http.MultipartFile.fromPath('file', croppedFile.path));
-    request.fields['name'] = 'Gym:i';
-    request.fields['age'] = '20';
-    request.fields['sex'] = 'woman';
+      // API 요청
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('https://strabismus-detector-149475634578.asia-northeast3.run.app/predict/'),
+      );
 
-    final response = await request.send();
-    final body = await response.stream.bytesToString();
-    final result = jsonDecode(body);
+      request.files.add(await http.MultipartFile.fromPath('file', croppedFile.path));
+      request.fields['name'] = 'Gym:i';
+      request.fields['age'] = '20';
+      request.fields['sex'] = 'woman';
 
-    if (!mounted) return;
+      final response = await request.send();
+      final body = await response.stream.bytesToString();
+      final result = jsonDecode(body);
 
-    final prediction = result['prediction'];
-    final isAbnormal = prediction['class'] != 'normal' && prediction['confidence'] >= 90;
+      if (!mounted) return;
 
-    if (isAbnormal) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => BadScreen(isVibrant: widget.isVibrant),
+      final prediction = result['prediction'];
+      final isAbnormal = prediction['class'] != 'normal' && prediction['confidence'] >= 90;
+
+      if (isAbnormal) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BadScreen(isVibrant: widget.isVibrant),
+          ),
+        );
+      } else {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => GoodScreen(isVibrant: widget.isVibrant),
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('오류가 발생했습니다. 다시 시도해주세요.'),
+          backgroundColor: Colors.red,
         ),
       );
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => GoodScreen(isVibrant: widget.isVibrant),
-        ),
-      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -226,10 +243,40 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
           bottom: 40,
           left: MediaQuery.of(context).size.width / 2 - 30,
           child: GestureDetector(
-            onTap: _takeAndSendPicture,
-            child: Image.asset('assets/images/camera_btn.png', width: 60),
+            onTap: _isLoading ? null : _takeAndSendPicture,
+            child: Image.asset(
+              'assets/images/camera_btn.png',
+              width: 60,
+              color: _isLoading ? Colors.grey : null,
+            ),
           ),
         ),
+
+        // 로딩 인디케이터
+        if (_isLoading)
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.5),
+              child: const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      '분석 중...',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }
