@@ -109,6 +109,20 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
 
       if (!mounted) return;
 
+      if (result.containsKey('error')) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['error']),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+
       final prediction = result['prediction'];
       final isAbnormal = prediction['class'] != 'normal' && prediction['confidence'] >= 90;
 
@@ -129,10 +143,13 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
       }
     } catch (e) {
       if (!mounted) return;
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('오류가 발생했습니다. 다시 시도해주세요.'),
           backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
         ),
       );
     } finally {
@@ -159,125 +176,127 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
     const rectHeight = 140.0;
     final rectLeft = (screenWidth - rectWidth) / 2;
 
-    return Stack(
-      children: [
-        CameraPreview(_controller),
-        // 반투명한 검은색 오버레이 (가이드 영역 제외)
-        Positioned.fill(
-          child: ClipPath(
-            clipper: EyeGuideClipper(
-              guideRect: Rect.fromLTWH(
-                rectLeft,
-                rectTop,
-                rectWidth,
-                rectHeight,
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          CameraPreview(_controller),
+          // 반투명한 검은색 오버레이 (가이드 영역 제외)
+          Positioned.fill(
+            child: ClipPath(
+              clipper: EyeGuideClipper(
+                guideRect: Rect.fromLTWH(
+                  rectLeft,
+                  rectTop,
+                  rectWidth,
+                  rectHeight,
+                ),
+              ),
+              child: Container(
+                color: Colors.black.withOpacity(0.34),
               ),
             ),
-            child: Container(
-              color: Colors.black.withOpacity(0.34),
-            ),
           ),
-        ),
-        // 눈 가이드 이미지
-        Positioned(
-          top: rectTop,
-          left: rectLeft,
-          child: Image.asset(
-            'assets/images/eye_guide.png',
-            key: _guideKey,
-            width: rectWidth,
-            height: rectHeight,
-          ),
-        ),
-        // 안내 텍스트
-        Positioned(
-            bottom: 270,
-            left: 0,
-            right: 0,
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(
-                    height: 150,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Please align your eyes within the ",
-                        style: GoogleFonts.lato(
-                            color: Colors.white,
-                            fontSize: 32,
-                            fontWeight: FontWeight.w400),
-                      ),
-                      Text(
-                        "hilighted",
-                        style: GoogleFonts.lato(
-                          color: Color(0xFFBBFF00),
-                          fontSize: 32,
-                          fontWeight: FontWeight.w400,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "area and make sure your face is well lit,",
-                        style: GoogleFonts.lato(
-                            color: Colors.white,
-                            fontSize: 32,
-                            fontWeight: FontWeight.w400
-                        ),
-                      ),
-                    ],
-                  )
-                ]
-            )
-        ),
-
-        // 촬영 버튼
-        Positioned(
-          bottom: 40,
-          left: MediaQuery.of(context).size.width / 2 - 30,
-          child: GestureDetector(
-            onTap: _isLoading ? null : _takeAndSendPicture,
+          // 눈 가이드 이미지
+          Positioned(
+            top: rectTop,
+            left: rectLeft,
             child: Image.asset(
-              'assets/images/camera_btn.png',
-              width: 60,
-              color: _isLoading ? Colors.grey : null,
+              'assets/images/eye_guide.png',
+              width: rectWidth,
+              height: rectHeight,
             ),
           ),
-        ),
-
-        // 로딩 인디케이터
-        if (_isLoading)
-          Positioned.fill(
-            child: Container(
-              color: Colors.black.withOpacity(0.5),
-              child: const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+          // 안내 텍스트
+          Positioned(
+              bottom: 270,
+              left: 0,
+              right: 0,
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    const SizedBox(
+                      height: 150,
                     ),
-                    SizedBox(height: 16),
-                    Text(
-                      '분석 중...',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Please align your eyes within the ",
+                          style: GoogleFonts.lato(
+                              color: Colors.white,
+                              fontSize: 32,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        Text(
+                          "hilighted",
+                          style: GoogleFonts.lato(
+                            color: Color(0xFFBBFF00),
+                            fontSize: 32,
+                            fontWeight: FontWeight.w400,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "area and make sure your face is well lit,",
+                          style: GoogleFonts.lato(
+                              color: Colors.white,
+                              fontSize: 32,
+                              fontWeight: FontWeight.w400
+                          ),
+                        ),
+                      ],
+                    )
+                  ]
+              )
+          ),
+
+          // 촬영 버튼
+          Positioned(
+            bottom: 40,
+            left: MediaQuery.of(context).size.width / 2 - 30,
+            child: GestureDetector(
+              onTap: _isLoading ? null : _takeAndSendPicture,
+              child: Image.asset(
+                'assets/images/camera_btn.png',
+                width: 60,
+                color: _isLoading ? Colors.grey : null,
+              ),
+            ),
+          ),
+
+          // 로딩 인디케이터
+          if (_isLoading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.5),
+                child: const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 16),
+                      Text(
+                        '분석 중...',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }
