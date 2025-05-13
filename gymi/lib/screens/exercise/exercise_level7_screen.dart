@@ -1,16 +1,10 @@
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level8_screen.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level9_screen.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:flutter/material.dart';
 import 'package:eyedid_flutter_example/%08screens/exercise/exercise_intro.dart';
-
-import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise/exercise_intro.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level9_screen.dart';
 
 class ExerciseLevel7Stage extends StatefulWidget {
   final bool isVibrant;
