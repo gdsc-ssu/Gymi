@@ -17,7 +17,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver  {
   final _gazeService = GazeTrackerService();
   var _hasCameraPermission = false;
   var _isInitialied = false;
@@ -225,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildMenuButton(context, 'Start exercise', () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const Exercise3()),
+                    MaterialPageRoute(builder: (context) => Exercise3(isVibrant: widget.isVibrant,)),
                   );
                 }),
               ],
