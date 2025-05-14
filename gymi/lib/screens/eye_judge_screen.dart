@@ -41,7 +41,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
   Future<void> _initCamera() async {
     final cameras = await availableCameras();
     final front = cameras.firstWhere(
-          (camera) => camera.lensDirection == CameraLensDirection.front,
+      (camera) => camera.lensDirection == CameraLensDirection.front,
     );
 
     _controller = CameraController(front, ResolutionPreset.medium);
@@ -84,9 +84,11 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
 
     try {
       // 화면 스크린샷 캡처
-      final RenderRepaintBoundary boundary = _guideKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      final RenderRepaintBoundary boundary =
+          _guideKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
       final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) return;
 
       final bytes = byteData.buffer.asUint8List();
@@ -119,7 +121,8 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
       // 크롭된 이미지 저장
       final croppedBytes = img.encodeJpg(croppedImage);
       final tempDir = await Directory.systemTemp.createTemp();
-      final croppedFile = File('${tempDir.path}/cropped_${DateTime.now().millisecondsSinceEpoch}.jpg');
+      final croppedFile = File(
+          '${tempDir.path}/cropped_${DateTime.now().millisecondsSinceEpoch}.jpg');
       await croppedFile.writeAsBytes(croppedBytes);
 
       if (!mounted) return;
@@ -131,28 +134,25 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             backgroundColor: Color(widget.isVibrant ? 0xFFAEC7DF : 0xFFA38D7D),
-            title: Text(
-                'Check Cropped Image',
+            title: Text('Check Cropped Image',
                 style: GoogleFonts.lato(
                   color: Color(widget.isVibrant ? 0xFF0069D7 : 0xFF59302D),
                   fontSize: 28,
                   fontWeight: FontWeight.w400,
-                )
-            ),
+                )),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Image.file(croppedFile),
                   const SizedBox(height: 16),
-                  Text(
-                      'Would you like to proceed using this image?',
+                  Text('Would you like to proceed using this image?',
                       style: GoogleFonts.lato(
-                        color: Color(widget.isVibrant ? 0xFF0069D7 : 0xFF59302D),
+                        color:
+                            Color(widget.isVibrant ? 0xFF0069D7 : 0xFF59302D),
                         fontSize: 24,
                         fontWeight: FontWeight.w400,
-                      )
-                  ),
+                      )),
                 ],
               ),
             ),
@@ -161,14 +161,12 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
                 onPressed: () {
                   Navigator.of(context).pop(false);
                 },
-                child: Text(
-                    'Try Again',
+                child: Text('Try Again',
                     style: GoogleFonts.lato(
                       color: Color(widget.isVibrant ? 0xFF0069D7 : 0xFF59302D),
                       fontSize: 24,
                       fontWeight: FontWeight.w400,
-                    )
-                ),
+                    )),
               ),
               TextButton(
                 onPressed: () {
@@ -179,8 +177,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
                       color: Color(widget.isVibrant ? 0xFF0069D7 : 0xFF59302D),
                       fontSize: 24,
                       fontWeight: FontWeight.w400,
-                    )
-                ),
+                    )),
               ),
             ],
           );
@@ -195,10 +192,12 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
       // API 요청
       final request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://strabismus-detector-149475634578.asia-northeast3.run.app/predict/'),
+        Uri.parse(
+            'https://strabismus-detector-149475634578.asia-northeast3.run.app/predict/'),
       );
 
-      request.files.add(await http.MultipartFile.fromPath('file', croppedFile.path));
+      request.files
+          .add(await http.MultipartFile.fromPath('file', croppedFile.path));
       request.fields['name'] = 'Gym:i';
       request.fields['age'] = '20';
       request.fields['sex'] = 'woman';
@@ -215,7 +214,8 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
       }
 
       final prediction = result['prediction'];
-      final isAbnormal = prediction['class'] != 'normal' && prediction['confidence'] >= 90;
+      final isAbnormal =
+          prediction['class'] != 'normal' && prediction['confidence'] >= 90;
 
       if (isAbnormal) {
         Navigator.push(
@@ -285,14 +285,20 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
               top: rectTop,
               left: rectLeft,
               child: Image.asset(
-                _isError ? 'assets/images/eye_guide_error.png' : 'assets/images/eye_guide.png',
+                _isError
+                    ? 'assets/images/eye_guide_error.png'
+                    : 'assets/images/eye_guide.png',
                 width: rectWidth,
                 height: rectHeight,
               ),
             ),
             // 안내 텍스트
             Positioned(
-                bottom: screenHeight - rectTop - rectHeight - rectHeight - rectHeight,
+                bottom: screenHeight -
+                    rectTop -
+                    rectHeight -
+                    rectHeight -
+                    rectHeight,
                 left: 0,
                 right: 0,
                 child: Column(
@@ -315,7 +321,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
                             Text(
                               "hilighted",
                               style: GoogleFonts.lato(
-                                color: Color(0xFFBBFF00),
+                                color: const Color(0xFFBBFF00),
                                 fontSize: 32,
                                 fontWeight: FontWeight.w400,
                                 fontStyle: FontStyle.italic,
@@ -331,8 +337,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
                               style: GoogleFonts.lato(
                                   color: Colors.white,
                                   fontSize: 32,
-                                  fontWeight: FontWeight.w400
-                              ),
+                                  fontWeight: FontWeight.w400),
                             ),
                           ],
                         ),
@@ -372,9 +377,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
                           ],
                         ),
                       ],
-                    ]
-                )
-            ),
+                    ])),
 
             // 촬영 버튼
             Positioned(
@@ -400,7 +403,8 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                         SizedBox(height: 16),
                         Text(
@@ -423,7 +427,8 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
                 left: MediaQuery.of(context).size.width * 0.2,
                 right: MediaQuery.of(context).size.width * 0.2,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   decoration: BoxDecoration(
                     color: Colors.red,
                     borderRadius: BorderRadius.circular(8),

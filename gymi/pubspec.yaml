@@ -28,7 +28,7 @@ dependencies:
 #    git:
 #      url: https://github.com/eyedid-inc/eyedid-flutter.git
 #      ref: main
-
+  cloud_firestore: ^4.15.6
   firebase_core: ^2.30.0
   firebase_auth: ^4.17.8
   google_sign_in: ^6.2.1
@@ -70,6 +70,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    - assets/animations/
     - assets/audio/gymiBgm.mp3
     - assets/audio/correct.mp3
     - assets/sounds/

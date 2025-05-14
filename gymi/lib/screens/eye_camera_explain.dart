@@ -1,7 +1,6 @@
 import 'package:eyedid_flutter_example/%08screens/eye_judge_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class EyeCameraExplainScreen extends StatefulWidget {
@@ -19,7 +18,7 @@ class _EyeCameraExplainState extends State<EyeCameraExplainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor:
-        widget.isVibrant ? const Color(0xFFAEC7DF) : const Color(0xFFA38D7D),
+          widget.isVibrant ? const Color(0xFFAEC7DF) : const Color(0xFFA38D7D),
       body: Stack(
         children: [
           Align(
@@ -72,8 +71,7 @@ class _EyeCameraExplainState extends State<EyeCameraExplainScreen> {
                               style: GoogleFonts.roboto(
                                   color: Colors.white,
                                   fontSize: 24,
-                                  fontWeight: FontWeight.w400
-                              ),
+                                  fontWeight: FontWeight.w400),
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -83,25 +81,20 @@ class _EyeCameraExplainState extends State<EyeCameraExplainScreen> {
                                   style: GoogleFonts.roboto(
                                       color: Colors.white,
                                       fontSize: 24,
-                                      fontWeight: FontWeight.w400
-                                  ),
+                                      fontWeight: FontWeight.w400),
                                 ),
-                                Text(
-                                    " customize ",
+                                Text(" customize ",
                                     style: GoogleFonts.roboto(
                                         color: const Color(0xFFBBFF00),
                                         fontSize: 24,
                                         fontWeight: FontWeight.w400,
-                                        fontStyle: FontStyle.italic
-                                    )
-                                ),
+                                        fontStyle: FontStyle.italic)),
                                 Text(
                                   "your training better.",
                                   style: GoogleFonts.roboto(
                                       color: Colors.white,
                                       fontSize: 24,
-                                      fontWeight: FontWeight.w400
-                                  ),
+                                      fontWeight: FontWeight.w400),
                                 ),
                               ],
                             ),
@@ -116,18 +109,16 @@ class _EyeCameraExplainState extends State<EyeCameraExplainScreen> {
           ),
           // line.png
           Positioned(
-            bottom: 250,
-            left: 544,
-            child: Center(
-              child: Row(
+              bottom: 250,
+              left: 544,
+              child: Center(
+                  child: Row(
                 children: [
                   Image.asset(
                     'assets/images/line.png',
                   ),
                 ],
-              )
-            )
-          ),
+              ))),
           // 하단 중앙 버튼 컨테이너
           Positioned(
             left: 0,
@@ -150,13 +141,14 @@ class _EyeCameraExplainState extends State<EyeCameraExplainScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => EyeJudgeScreen(isVibrant: widget.isVibrant)),
+                                builder: (context) => EyeJudgeScreen(
+                                    isVibrant: widget.isVibrant)),
                           );
                         },
                         child: Container(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Colors.white,
-                            borderRadius: const BorderRadius.horizontal(
+                            borderRadius: BorderRadius.horizontal(
                               left: Radius.circular(25),
                             ),
                           ),
@@ -198,12 +190,14 @@ class _EyeCameraExplainState extends State<EyeCameraExplainScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => HomeScreen(isVibrant: widget.isVibrant)),
+                                builder: (context) =>
+                                    HomeScreen(isVibrant: widget.isVibrant)),
                           );
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            color: !isVibrant ? Colors.white : Colors.transparent,
+                            color:
+                                !isVibrant ? Colors.white : Colors.transparent,
                             borderRadius: const BorderRadius.horizontal(
                               right: Radius.circular(25),
                             ),

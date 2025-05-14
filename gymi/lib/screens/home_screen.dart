@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'package:eyedid_flutter_example/%08screens/exercise/exercise_intro.dart';
 
-import 'package:eyedid_flutter_example/%08screens/exercise2.dart';
+import 'package:eyedid_flutter_example/%08screens/tutorial/tutorial.dart';
 import 'package:eyedid_flutter_example/%08screens/calibration_screen.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise3.dart';
+import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level1_screen.dart';
+import 'package:eyedid_flutter_example/%08screens/game/game_screen.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise2_intro.dart';
+import 'package:eyedid_flutter_example/%08screens/tutorial/tutorial_intro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -19,7 +21,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver  {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final _gazeService = GazeTrackerService();
   var _hasCameraPermission = false;
   var _isInitialied = false;
@@ -41,8 +43,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver  {
 
   @override
   void initState() {
-    super.initState();
     _fetchLicenseKeyAndInitialize();
+    super.initState();
   }
 
   @override
@@ -245,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver  {
           // 오른쪽 메뉴 버튼들
           Positioned(
             right: 150,
-            bottom: 80,
+            bottom: 40,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -254,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver  {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => Exercise2IntroScreen(
+                        builder: (context) => TutorialIntroScreen(
                               isVibrant: widget.isVibrant,
                             )),
                   );
@@ -278,12 +280,34 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver  {
                 const SizedBox(height: 20),
 
                 // Start exercise 버튼
-                _buildMenuButton(context, 'Start exercise', () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Exercise3(isVibrant: widget.isVibrant,)),
-                  );
-                }),
+                _buildMenuButton(
+                  context,
+                  'Start exercise',
+                  () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ExerciseIntroScreen(isVibrant: widget.isVibrant),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+                // Game 버튼
+                _buildMenuButton(
+                  context,
+                  'Play Game',
+                  () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            GameScreen(isVibrant: widget.isVibrant),
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
           ),
