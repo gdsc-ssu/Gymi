@@ -1,12 +1,17 @@
 import 'dart:async';
 import 'package:eyedid_flutter_example/%08screens/exercise/exercise_intro.dart';
+
 import 'package:eyedid_flutter_example/%08screens/exercise2.dart';
 import 'package:eyedid_flutter_example/%08screens/calibration_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level1_screen.dart';
+import 'package:eyedid_flutter_example/%08screens/exercise3.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:eyedid_flutter_example/%08screens/exercise2_intro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool isVibrant;
@@ -16,11 +21,11 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final _gazeService = GazeTrackerService();
   var _hasCameraPermission = false;
   var _isInitialied = false;
-  final _licenseKey = "dev_pfst1u7ac35i0k94ia0crcapirnrjrznalqb92bu";
+  String? _licenseKey;
   var _version = 'Unknown';
   var _stateString = "IDLE";
   var _hasCameraPermissionString = "NO_GRANTED";
@@ -38,9 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    initPlatformState();
+    _fetchLicenseKeyAndInitialize();
   }
 
   @override
@@ -50,6 +54,54 @@ class _HomeScreenState extends State<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _gazeService.updateContext(context);
     });
+  }
+
+  Future<void> _fetchLicenseKeyAndInitialize() async {
+    try {
+      print('Firebase에서 API 키 가져오기 시작...');
+      if (FirebaseAuth.instance.currentUser == null) {
+        print('사용자 인증 필요: 익명 로그인 시도 중...');
+        await FirebaseAuth.instance.signInAnonymously();
+      }
+
+      final docSnapshot = await FirebaseFirestore.instance
+          .collection('config')
+          .doc('api_keys')
+          .get();
+
+      if (docSnapshot.exists &&
+          docSnapshot.data()!.containsKey('eyedid_license_key')) {
+        String keyValue = docSnapshot.data()!['eyedid_license_key'];
+        print('✅ 성공: API 키를 Firebase에서 성공적으로 가져왔습니다! 키: $keyValue');
+
+        setState(() {
+          _licenseKey = keyValue;
+        });
+
+        initPlatformState();
+      } else {
+        // API 키가 없으면 에러 발생
+        throw Exception('Firebase에서 API 키를 찾을 수 없습니다.');
+      }
+    } catch (e) {
+      print('❌ API 키 가져오기 오류: $e');
+
+      // 폴백 키를 사용하지 않고 에러 상태로 설정
+      setState(() {
+        _stateString = "API 키 오류: $e";
+      });
+
+      // 사용자에게 알림 표시
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('API 키를 가져오는 데 실패했습니다: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
+    }
   }
 
   Future<void> checkCameraPermission() async {
@@ -88,8 +140,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> initEyedidPlugin() async {
+    if (_licenseKey == null) {
+      setState(() {
+        _stateString = "No license key available";
+      });
+      return;
+    }
+
     final initialized =
-        await _gazeService.initialize(_licenseKey, context: context);
+        await _gazeService.initialize(_licenseKey!, context: context);
 
     if (initialized) {
       final isTracking = await _gazeService.isTrackingNow();
@@ -193,8 +252,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Tutorial 버튼
-                _buildMenuButton(context, 'Tutorial', const Color(0xFF333333),
-                    FontWeight.bold, () {
+                _buildMenuButton(context, 'Tutorial', () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -207,8 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 20),
 
                 // Calibrate 버튼
-                _buildMenuButton(
-                    context, 'Calibrate', Colors.grey, FontWeight.normal, () {
+                _buildMenuButton(context, 'Calibrate', () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -223,9 +280,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 20),
 
                 // Start exercise 버튼
-                _buildMenuButton(
-                    context, 'Start exercise', Colors.grey, FontWeight.normal,
-                    () {
+                _buildMenuButton(context, 'Start exercise', () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -243,19 +298,24 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // 메뉴 버튼 위젯
-  Widget _buildMenuButton(BuildContext context, String text, Color textColor,
-      FontWeight fontWeight, VoidCallback onTap) {
+  Widget _buildMenuButton(
+      BuildContext context, String text, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
-      child: Text(
-        text,
-        style: TextStyle(
-          color: textColor,
-          fontSize: 48,
-          fontWeight: fontWeight,
-        ),
-      ),
+      child: Text(text,
+          style: GoogleFonts.robotoSlab(
+              color: Colors.black,
+              fontSize: 48,
+              fontStyle: FontStyle.normal,
+              fontWeight: FontWeight.w200)),
     );
+  }
+
+  @override
+  void dispose() {
+    _gazeSubscription?.cancel();
+    _calibrationSubscription?.cancel();
+    super.dispose();
   }
 }
 
@@ -295,6 +355,14 @@ class ExerciseScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Text(
+              'Exercise Screen',
+              style: GoogleFonts.robotoSlab(
+                  color: Colors.white,
+                  fontSize: 48,
+                  fontStyle: FontStyle.normal,
+                  fontWeight: FontWeight.w200),
+            ),
             const Text('Exercise Screen', style: TextStyle(fontSize: 24)),
             const SizedBox(height: 20),
             ElevatedButton(

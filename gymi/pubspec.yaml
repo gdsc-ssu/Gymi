@@ -25,11 +25,23 @@ dependencies:
     # The example app is bundled with the plugin so we use a path dependency on
     # the parent directory to use the current plugin's version.
     path: ../
+#    git:
+#      url: https://github.com/eyedid-inc/eyedid-flutter.git
+#      ref: main
+  cloud_firestore: ^4.15.6
+  firebase_core: ^2.30.0
+  firebase_auth: ^4.17.8
+  google_sign_in: ^6.2.1
+  camera: ^0.10.5+9
+  http: ^1.2.1
+  shared_preferences: ^2.2.3
+  image: ^4.1.7
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   lottie: ^3.3.1
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   integration_test:
@@ -61,6 +73,7 @@ flutter:
     - assets/animations/
     - assets/audio/gymiBgm.mp3
     - assets/audio/correct.mp3
+    - assets/sounds/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

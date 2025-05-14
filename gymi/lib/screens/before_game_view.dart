@@ -1,6 +1,7 @@
 import 'package:eyedid_flutter_example/%08screens/exercise2.dart';
 import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class BeforeGameView extends StatelessWidget {
   final bool isVibrant;
@@ -19,33 +20,49 @@ class BeforeGameView extends StatelessWidget {
               children: [
                 RichText(
                   textAlign: TextAlign.center,
-                  text: const TextSpan(
-                    style: TextStyle(
+                  text: TextSpan(
+                    style: const TextStyle(
                       fontSize: 40,
                       color: Colors.white,
                       fontWeight: FontWeight.normal,
                     ),
                     children: [
-                      TextSpan(text: "Let’s do a "),
+                      TextSpan(
+                        text: "Let’s do a ",
+                        style: GoogleFonts.roboto(
+                            color: Colors.white,
+                            fontSize: 48,
+                            fontStyle: FontStyle.normal,
+                            fontWeight: FontWeight.w200),
+                      ),
                       TextSpan(
                         text: "simple workout",
-                        style: TextStyle(
-                          fontStyle: FontStyle.italic,
-                          fontWeight: FontWeight.bold, // 강조
-                        ),
+                        style: GoogleFonts.roboto(
+                            color: Colors.white,
+                            fontSize: 48,
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.w400),
                       ),
-                      TextSpan(text: " that can might"),
+                      TextSpan(
+                        text: " that can might",
+                        style: GoogleFonts.roboto(
+                            color: Colors.white,
+                            fontSize: 48,
+                            fontStyle: FontStyle.normal,
+                            fontWeight: FontWeight.w200),
+                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   "help with your eye condition.",
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 40,
-                    color: Colors.white,
-                  ),
+                  style: GoogleFonts.roboto(
+                      color: Colors.white,
+                      fontSize: 48,
+                      fontStyle: FontStyle.normal,
+                      fontWeight: FontWeight.w200),
                 ),
               ],
             ),

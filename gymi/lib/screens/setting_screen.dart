@@ -2,6 +2,7 @@ import 'package:eyedid_flutter_example/%08screens/calibration_screen.dart';
 import 'package:eyedid_flutter_example/service/audio_service.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SettingsScreen extends StatefulWidget {
   final bool isVibrant;
@@ -35,24 +36,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     isBackgroundMusicEnabled = _audioService.isPlaying;
   }
 
-  void performRecalibration() {
-    // Navigate to calibration screen or show calibration dialog
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Eye Tracking Calibration'),
-        content: const Text(
-            'This would navigate to the eye tracking calibration screen.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,7 +50,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   height: 173,
                 ),
                 Container(
-                  width: 650,
+                  width: 680,
                   height: 500,
                   padding: const EdgeInsets.fromLTRB(110, 0, 0, 0),
                   decoration: BoxDecoration(
@@ -90,23 +73,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Audio section
-                            const Text(
-                              'Audio',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 36,
-                              ),
-                            ),
+                            Text('Audio',
+                                style: GoogleFonts.robotoSlab(
+                                    color: Colors.white,
+                                    fontSize: 36,
+                                    fontStyle: FontStyle.normal,
+                                    fontWeight: FontWeight.w300)),
+
                             const SizedBox(height: 18),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text(
+                                Text(
                                   'Background music',
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 36,
-                                  ),
+                                  style: GoogleFonts.robotoSlab(
+                                      color: Colors.white70,
+                                      fontSize: 36,
+                                      fontStyle: FontStyle.normal,
+                                      fontWeight: FontWeight.w100),
                                 ),
                                 Switch(
                                   value: isBackgroundMusicEnabled,
@@ -117,23 +101,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             const SizedBox(height: 55),
                             // Eye tracking section
-                            const Text(
+                            Text(
                               'Eye tracking',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 36,
-                              ),
+                              style: GoogleFonts.robotoSlab(
+                                  color: Colors.white,
+                                  fontSize: 36,
+                                  fontStyle: FontStyle.normal,
+                                  fontWeight: FontWeight.w300),
                             ),
                             const SizedBox(height: 18),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text(
+                                Text(
                                   'Perform Re-calibration',
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 36,
-                                  ),
+                                  style: GoogleFonts.robotoSlab(
+                                      color: Colors.white70,
+                                      fontSize: 36,
+                                      fontStyle: FontStyle.normal,
+                                      fontWeight: FontWeight.w100),
                                 ),
                                 IconButton(
                                     icon: const Icon(

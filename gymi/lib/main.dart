@@ -1,8 +1,5 @@
-import 'package:eyedid_flutter/constants/eyedid_flutter_calibration_option.dart';
-import 'package:eyedid_flutter/events/eyedid_flutter_drop.dart';
-import 'package:eyedid_flutter/eyedid_flutter_initialized_result.dart';
-import 'package:eyedid_flutter_example/%08screens/before_game_view.dart';
-
+import 'package:eyedid_flutter_example/%08screens/login_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:eyedid_flutter_example/%08screens/calibration_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/color_select_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/home_screen.dart';
@@ -24,6 +21,7 @@ import 'service/gaze_tracker_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   await AudioService().playMusic();
   runApp(const MyApp());
 }
@@ -51,7 +49,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const ColorSelectScreen(), // ✅ Navigator가 정상 작동하도록 변경
+      home: const LoginScreen(), // ✅ Navigator가 정상 작동하도록 변경
     );
   }
 }

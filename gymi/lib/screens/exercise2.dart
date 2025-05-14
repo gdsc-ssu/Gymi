@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../service/gaze_tracker_service.dart';
 import 'package:eyedid_flutter_example/%08screens/home_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
@@ -326,24 +327,24 @@ class _Exercies2State extends State<Exercies2> with WidgetsBindingObserver {
                           size: 100,
                         ),
                         const SizedBox(height: 40),
-                        const Text(
+                        Text(
                           "Great Job!\nAll directions completed!",
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 50,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: GoogleFonts.roboto(
+                              color: Colors.white,
+                              fontSize: 50,
+                              fontStyle: FontStyle.normal,
+                              fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 20),
                         Text(
                           "Returning to Home Screen...", // 추가된 안내 메시지
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: 26,
-                            fontStyle: FontStyle.italic,
-                          ),
+                          style: GoogleFonts.roboto(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.w300),
                         ),
                       ],
                     )
