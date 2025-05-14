@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:camera/camera.dart';
 import 'package:eyedid_flutter_example/%08screens/bad_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/good_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -78,12 +81,15 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final file = await _controller.takePicture();
+      // 화면 스크린샷 캡처
+      final RenderRepaintBoundary boundary = _guideKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) return;
 
-      // 이미지 크롭
-      final bytes = await File(file.path).readAsBytes();
-      final image = img.decodeImage(bytes);
-      if (image == null) return;
+      final bytes = byteData.buffer.asUint8List();
+      final imageFile = img.decodeImage(bytes);
+      if (imageFile == null) return;
 
       // 화면 크기
       final screenWidth = MediaQuery.of(context).size.width;
@@ -95,26 +101,15 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
       const rectHeight = 140.0;
       final rectLeft = (screenWidth - rectWidth) / 2;
 
-      // 카메라 프리뷰 크기
-      final previewSize = _controller.value.previewSize;
-      if (previewSize == null) return;
-
-      // 실제 이미지와 프리뷰의 비율 계산
-      final scaleX = image.width / previewSize.width;
-      final scaleY = image.height / previewSize.height;
-
-      // 프리뷰가 화면에 표시되는 비율 계산
-      final previewScale = previewSize.width / screenWidth;
-
-      // 실제 이미지에서의 크롭 영역 계산
-      final cropX = (rectLeft * previewScale * scaleX).round();
-      final cropY = (rectTop * previewScale * scaleY).round();
-      final cropWidth = (rectWidth * previewScale * scaleX).round();
-      final cropHeight = (rectHeight * previewScale * scaleY).round();
+      // 스크린샷에서의 크롭 영역 계산
+      final cropX = (rectLeft * 3.0).round(); // pixelRatio 고려
+      final cropY = (rectTop * 3.0).round();
+      final cropWidth = (rectWidth * 3.0).round();
+      final cropHeight = (rectHeight * 3.0).round();
 
       // 이미지 크롭
       final croppedImage = img.copyCrop(
-        image,
+        imageFile,
         x: cropX,
         y: cropY,
         width: cropWidth,
@@ -123,7 +118,8 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
 
       // 크롭된 이미지 저장
       final croppedBytes = img.encodeJpg(croppedImage);
-      final croppedFile = File('${file.path}_cropped.jpg');
+      final tempDir = await Directory.systemTemp.createTemp();
+      final croppedFile = File('${tempDir.path}/cropped_${DateTime.now().millisecondsSinceEpoch}.jpg');
       await croppedFile.writeAsBytes(croppedBytes);
 
       if (!mounted) return;
@@ -131,27 +127,36 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
       // 크롭된 이미지 확인 다이얼로그 표시
       final shouldProceed = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Check Cropped Image'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.file(croppedFile),
-              const SizedBox(height: 16),
-              const Text('Would you like to proceed using this image?'),
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Check Cropped Image'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.file(croppedFile),
+                  const SizedBox(height: 16),
+                  const Text('Would you like to proceed using this image?'),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+                child: const Text('Try Again'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+                child: const Text('Proceed'),
+              ),
             ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Try Again'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Proceed'),
-            ),
-          ],
-        ),
+          );
+        },
       );
 
       if (shouldProceed != true) {
@@ -228,184 +233,187 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Stack(
-        children: [
-          CameraPreview(_controller),
-          // 반투명한 검은색 오버레이 (가이드 영역 제외)
-          Positioned.fill(
-            child: ClipPath(
-              clipper: EyeGuideClipper(
-                guideRect: Rect.fromLTWH(
-                  rectLeft,
-                  rectTop,
-                  rectWidth,
-                  rectHeight,
-                ),
-              ),
-              child: Container(
-                color: Colors.black.withOpacity(0.34),
-              ),
-            ),
-          ),
-          // 눈 가이드 이미지
-          Positioned(
-            top: rectTop,
-            left: rectLeft,
-            child: Image.asset(
-              _isError ? 'assets/images/eye_guide_error.png' : 'assets/images/eye_guide.png',
-              width: rectWidth,
-              height: rectHeight,
-            ),
-          ),
-          // 안내 텍스트
-          Positioned(
-              bottom: 270,
-              left: 0,
-              right: 0,
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(
-                      height: 150,
-                    ),
-                    if (!_isError) ...[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Please align your eyes within the ",
-                            style: GoogleFonts.lato(
-                                color: Colors.white,
-                                fontSize: 32,
-                                fontWeight: FontWeight.w400),
-                          ),
-                          Text(
-                            "hilighted",
-                            style: GoogleFonts.lato(
-                              color: Color(0xFFBBFF00),
-                              fontSize: 32,
-                              fontWeight: FontWeight.w400,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "area and make sure your face is well lit,",
-                            style: GoogleFonts.lato(
-                                color: Colors.white,
-                                fontSize: 32,
-                                fontWeight: FontWeight.w400
-                            ),
-                          ),
-                        ],
-                      ),
-                    ] else ...[
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(left: rectLeft),
-                            child: GestureDetector(
-                              onTap: _handleRetry,
-                              child: Text(
-                                '>     Retry',
-                                style: GoogleFonts.lato(
-                                  color: Colors.white,
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Padding(
-                            padding: EdgeInsets.only(left: rectLeft),
-                            child: GestureDetector(
-                              onTap: _handleSkip,
-                              child: Text(
-                                '>    Skip',
-                                style: GoogleFonts.lato(
-                                  color: Colors.white,
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ]
-              )
-          ),
-
-          // 촬영 버튼
-          Positioned(
-            bottom: 40,
-            left: MediaQuery.of(context).size.width / 2 - 30,
-            child: GestureDetector(
-              onTap: _isLoading ? null : _takeAndSendPicture,
-              child: Image.asset(
-                'assets/images/camera_btn.png',
-                width: 60,
-                color: _isLoading ? Colors.grey : null,
-              ),
-            ),
-          ),
-
-          // 로딩 인디케이터
-          if (_isLoading)
+      body: RepaintBoundary(
+        key: _guideKey,
+        child: Stack(
+          children: [
+            CameraPreview(_controller),
+            // 반투명한 검은색 오버레이 (가이드 영역 제외)
             Positioned.fill(
-              child: Container(
-                color: Colors.black.withOpacity(0.5),
-                child: const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        '분석 중...',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
+              child: ClipPath(
+                clipper: EyeGuideClipper(
+                  guideRect: Rect.fromLTWH(
+                    rectLeft,
+                    rectTop,
+                    rectWidth,
+                    rectHeight,
                   ),
+                ),
+                child: Container(
+                  color: Colors.black.withOpacity(0.34),
+                ),
+              ),
+            ),
+            // 눈 가이드 이미지
+            Positioned(
+              top: rectTop,
+              left: rectLeft,
+              child: Image.asset(
+                _isError ? 'assets/images/eye_guide_error.png' : 'assets/images/eye_guide.png',
+                width: rectWidth,
+                height: rectHeight,
+              ),
+            ),
+            // 안내 텍스트
+            Positioned(
+                bottom: 270,
+                left: 0,
+                right: 0,
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        height: 150,
+                      ),
+                      if (!_isError) ...[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Please align your eyes within the ",
+                              style: GoogleFonts.lato(
+                                  color: Colors.white,
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                            Text(
+                              "hilighted",
+                              style: GoogleFonts.lato(
+                                color: Color(0xFFBBFF00),
+                                fontSize: 32,
+                                fontWeight: FontWeight.w400,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "area and make sure your face is well lit,",
+                              style: GoogleFonts.lato(
+                                  color: Colors.white,
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.w400
+                              ),
+                            ),
+                          ],
+                        ),
+                      ] else ...[
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(left: rectLeft),
+                              child: GestureDetector(
+                                onTap: _handleRetry,
+                                child: Text(
+                                  '>     Retry',
+                                  style: GoogleFonts.lato(
+                                    color: Colors.white,
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Padding(
+                              padding: EdgeInsets.only(left: rectLeft),
+                              child: GestureDetector(
+                                onTap: _handleSkip,
+                                child: Text(
+                                  '>    Skip',
+                                  style: GoogleFonts.lato(
+                                    color: Colors.white,
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ]
+                )
+            ),
+
+            // 촬영 버튼
+            Positioned(
+              bottom: 40,
+              left: MediaQuery.of(context).size.width / 2 - 30,
+              child: GestureDetector(
+                onTap: _isLoading ? null : _takeAndSendPicture,
+                child: Image.asset(
+                  'assets/images/camera_btn.png',
+                  width: 60,
+                  color: _isLoading ? Colors.grey : null,
                 ),
               ),
             ),
 
-          // 에러 메시지
-          if (_errorMessage != null)
-            Positioned(
-              bottom: MediaQuery.of(context).size.height / 2,
-              left: MediaQuery.of(context).size.width * 0.2,
-              right: MediaQuery.of(context).size.width * 0.2,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  _errorMessage!,
-                  style: GoogleFonts.lato(
-                    color: Colors.white,
-                    fontSize: 24,
+            // 로딩 인디케이터
+            if (_isLoading)
+              Positioned.fill(
+                child: Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          '분석 중...',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  textAlign: TextAlign.center,
                 ),
               ),
-            ),
-        ],
+
+            // 에러 메시지
+            if (_errorMessage != null)
+              Positioned(
+                bottom: MediaQuery.of(context).size.height / 2,
+                left: MediaQuery.of(context).size.width * 0.2,
+                right: MediaQuery.of(context).size.width * 0.2,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    _errorMessage!,
+                    style: GoogleFonts.lato(
+                      color: Colors.white,
+                      fontSize: 24,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -428,4 +436,3 @@ class EyeGuideClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
-
