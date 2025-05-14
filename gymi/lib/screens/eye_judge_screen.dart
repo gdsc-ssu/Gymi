@@ -29,6 +29,8 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
   String? _errorMessage;
   bool _isError = false;
   final GlobalKey _guideKey = GlobalKey();
+  var rectWidth = 300.0;
+  var rectHeight = 70.0;
 
   @override
   void initState() {
@@ -97,8 +99,6 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
 
       // eye_guide.png의 위치와 크기
       final rectTop = screenHeight / 3;
-      const rectWidth = 600.0;
-      const rectHeight = 140.0;
       final rectLeft = (screenWidth - rectWidth) / 2;
 
       // 스크린샷에서의 크롭 영역 계산
@@ -255,8 +255,6 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final rectTop = screenHeight / 3;
-    const rectWidth = 600.0;
-    const rectHeight = 140.0;
     final rectLeft = (screenWidth - rectWidth) / 2;
 
     return Scaffold(
@@ -294,7 +292,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
             ),
             // 안내 텍스트
             Positioned(
-                bottom: 270,
+                bottom: screenHeight - rectTop - rectHeight - rectHeight - rectHeight,
                 left: 0,
                 right: 0,
                 child: Column(
