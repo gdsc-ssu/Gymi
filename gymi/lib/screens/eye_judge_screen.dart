@@ -36,7 +36,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
   Future<void> _initCamera() async {
     final cameras = await availableCameras();
     final front = cameras.firstWhere(
-          (camera) => camera.lensDirection == CameraLensDirection.front,
+      (camera) => camera.lensDirection == CameraLensDirection.front,
     );
 
     _controller = CameraController(front, ResolutionPreset.medium);
@@ -129,10 +129,12 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
       // API 요청
       final request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://strabismus-detector-149475634578.asia-northeast3.run.app/predict/'),
+        Uri.parse(
+            'https://strabismus-detector-149475634578.asia-northeast3.run.app/predict/'),
       );
 
-      request.files.add(await http.MultipartFile.fromPath('file', croppedFile.path));
+      request.files
+          .add(await http.MultipartFile.fromPath('file', croppedFile.path));
       request.fields['name'] = 'Gym:i';
       request.fields['age'] = '20';
       request.fields['sex'] = 'woman';
@@ -149,7 +151,8 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
       }
 
       final prediction = result['prediction'];
-      final isAbnormal = prediction['class'] != 'normal' && prediction['confidence'] >= 90;
+      final isAbnormal =
+          prediction['class'] != 'normal' && prediction['confidence'] >= 90;
 
       if (isAbnormal) {
         Navigator.push(
@@ -219,7 +222,9 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
             top: rectTop,
             left: rectLeft,
             child: Image.asset(
-              _isError ? 'assets/images/eye_guide_error.png' : 'assets/images/eye_guide.png',
+              _isError
+                  ? 'assets/images/eye_guide_error.png'
+                  : 'assets/images/eye_guide.png',
               width: rectWidth,
               height: rectHeight,
             ),
@@ -249,7 +254,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
                           Text(
                             "hilighted",
                             style: GoogleFonts.lato(
-                              color: Color(0xFFBBFF00),
+                              color: const Color(0xFFBBFF00),
                               fontSize: 32,
                               fontWeight: FontWeight.w400,
                               fontStyle: FontStyle.italic,
@@ -265,8 +270,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
                             style: GoogleFonts.lato(
                                 color: Colors.white,
                                 fontSize: 32,
-                                fontWeight: FontWeight.w400
-                            ),
+                                fontWeight: FontWeight.w400),
                           ),
                         ],
                       ),
@@ -306,9 +310,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
                         ],
                       ),
                     ],
-                  ]
-              )
-          ),
+                  ])),
 
           // 촬영 버튼
           Positioned(
@@ -357,7 +359,8 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
               left: MediaQuery.of(context).size.width * 0.2,
               right: MediaQuery.of(context).size.width * 0.2,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 decoration: BoxDecoration(
                   color: Colors.red,
                   borderRadius: BorderRadius.circular(8),
@@ -395,4 +398,3 @@ class EyeGuideClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
-
