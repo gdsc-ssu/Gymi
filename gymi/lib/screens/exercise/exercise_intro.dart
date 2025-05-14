@@ -8,6 +8,7 @@ import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level6_scree
 import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level7_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level8_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level9_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 // 여기에 LevelIntro 및 Stage import 추가 필요
 
@@ -111,15 +112,16 @@ class _ExercisesIntroState extends State<ExerciseIntroScreen> {
             ),
           ),
           // 제목 Positioned
-          const Positioned(
+          Positioned(
             top: 120,
             left: 80,
             child: Text(
               "Exercises",
-              style: TextStyle(
-                fontSize: 128,
-                color: Colors.white,
-              ),
+              style: GoogleFonts.roboto(
+                  color: Colors.white,
+                  fontSize: 128,
+                  fontStyle: FontStyle.normal,
+                  fontWeight: FontWeight.w300),
             ),
           ),
 
@@ -141,12 +143,13 @@ class _ExercisesIntroState extends State<ExerciseIntroScreen> {
                   onPressed: () {
                     _startLevel(1, isSingleMode: false);
                   },
-                  child: const Text(
+                  child: Text(
                     "Full Exercise",
-                    style: TextStyle(
-                      fontSize: 28,
-                      color: Colors.white,
-                    ),
+                    style: GoogleFonts.roboto(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontStyle: FontStyle.normal,
+                        fontWeight: FontWeight.w400),
                   ),
                 ),
 
@@ -177,10 +180,11 @@ class _ExercisesIntroState extends State<ExerciseIntroScreen> {
                         },
                         child: Text(
                           "Level $_currentLevel",
-                          style: const TextStyle(
-                            fontSize: 28,
-                            color: Colors.white,
-                          ),
+                          style: GoogleFonts.roboto(
+                              color: Colors.white,
+                              fontSize: 28,
+                              fontStyle: FontStyle.normal,
+                              fontWeight: FontWeight.w400),
                         ),
                       ),
                       const SizedBox(width: 10),

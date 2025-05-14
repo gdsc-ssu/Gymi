@@ -3,6 +3,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level9_screen.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'exercise_intro.dart'; // ← 다음 스크린으로 이동할 때 필요
 
@@ -135,9 +136,13 @@ class _ExerciseLevel8StageState extends State<ExerciseLevel8Stage>
               right: 50,
               child: RichText(
                 textAlign: TextAlign.left,
-                text: const TextSpan(
-                  style: TextStyle(fontSize: 36, color: Colors.white),
-                  children: [
+                text: TextSpan(
+                  style: GoogleFonts.roboto(
+                      color: Colors.white,
+                      fontSize: 36,
+                      fontStyle: FontStyle.normal,
+                      fontWeight: FontWeight.w300),
+                  children: const [
                     TextSpan(
                         text:
                             "Follow the target point moving in an infinity shape. \nPlease keep your head still. (30s)"),
@@ -147,19 +152,20 @@ class _ExerciseLevel8StageState extends State<ExerciseLevel8Stage>
             ),
           Center(
             child: _showCompletionMessage
-                ? const Column(
+                ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 100),
-                      SizedBox(height: 40),
+                      const Icon(Icons.check_circle,
+                          color: Colors.green, size: 100),
+                      const SizedBox(height: 40),
                       Text(
                         "Workout is done!\nThank you for your effort!",
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 50,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: GoogleFonts.roboto(
+                            color: Colors.white,
+                            fontSize: 50,
+                            fontStyle: FontStyle.normal,
+                            fontWeight: FontWeight.bold),
                       ),
                     ],
                   )
@@ -207,18 +213,18 @@ class _ExerciseLevel8StageState extends State<ExerciseLevel8Stage>
               ),
             ),
           ),
-          const Positioned(
+          Positioned(
             bottom: 50,
             left: 0,
             right: 0,
             child: Text(
               "Level 8",
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 36,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+              style: GoogleFonts.roboto(
+                  color: Colors.white,
+                  fontSize: 36,
+                  fontStyle: FontStyle.normal,
+                  fontWeight: FontWeight.bold),
             ),
           ),
           Positioned(
@@ -295,14 +301,15 @@ class _ExerciseLevel8IntroState extends State<ExerciseLevel8Intro> {
               ),
             ),
           ),
-          const Center(
+          Center(
             child: Text(
               "Level 8",
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 128,
-                color: Colors.white,
-              ),
+              style: GoogleFonts.roboto(
+                  color: Colors.white,
+                  fontSize: 128,
+                  fontStyle: FontStyle.normal,
+                  fontWeight: FontWeight.w200),
             ),
           ),
         ],
