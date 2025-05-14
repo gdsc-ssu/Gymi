@@ -2,20 +2,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../service/gaze_tracker_service.dart';
+import '../../service/gaze_tracker_service.dart';
 import 'package:eyedid_flutter_example/%08screens/home_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
 import 'package:audioplayers/audioplayers.dart';
 
-class Exercies2 extends StatefulWidget {
+class Tutorial extends StatefulWidget {
   final bool isVibrant;
-  const Exercies2({super.key, this.isVibrant = true});
+  const Tutorial({super.key, this.isVibrant = true});
 
   @override
-  State<Exercies2> createState() => _Exercies2State();
+  State<Tutorial> createState() => _TutorialState();
 }
 
-class _Exercies2State extends State<Exercies2> with WidgetsBindingObserver {
+class _TutorialState extends State<Tutorial> with WidgetsBindingObserver {
   final _gazeService = GazeTrackerService();
   final AudioPlayer _audioPlayer = AudioPlayer();
 

@@ -4,17 +4,17 @@ import 'package:eyedid_flutter_example/%08screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../service/gaze_tracker_service.dart';
+import '../../service/gaze_tracker_service.dart';
 
-class Exercise3 extends StatefulWidget {
+class GameScreen extends StatefulWidget {
   final bool isVibrant;
-  const Exercise3({super.key, required this.isVibrant});
+  const GameScreen({super.key, required this.isVibrant});
 
   @override
-  State<Exercise3> createState() => _Exercise3State();
+  State<GameScreen> createState() => _GameScreenState();
 }
 
-class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
+class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   final _gazeService = GazeTrackerService();
 
   // 현재 시선 위치
@@ -144,7 +144,8 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
     });
 
     // 시선 체크 타이머 (100ms마다 시선이 두더지 위에 있는지 체크)
-    _gazeCheckTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+    _gazeCheckTimer =
+        Timer.periodic(const Duration(milliseconds: 100), (timer) {
       _checkGazeOnMoles();
     });
   }
@@ -191,7 +192,9 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
     Timer(const Duration(seconds: 3), () {
       if (mounted && _screenActive) {
         setState(() {
-          if (_moleVisible[selectedSlot] && !_moleGazing[selectedSlot] && _moleGazeStartTime[selectedSlot] != null) {
+          if (_moleVisible[selectedSlot] &&
+              !_moleGazing[selectedSlot] &&
+              _moleGazeStartTime[selectedSlot] != null) {
             _playFailSound();
           }
           _moleVisible[selectedSlot] = false;
@@ -222,7 +225,10 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
       double top = row * cellHeight;
 
       // 시선이 현재 셀 안에 있는지 확인
-      if (_x >= left && _x < left + cellWidth && _y >= top && _y < top + cellHeight) {
+      if (_x >= left &&
+          _x < left + cellWidth &&
+          _y >= top &&
+          _y < top + cellHeight) {
         // 시선이 두더지 위에 있는 경우
         if (_moleGazeStartTime[i] == null) {
           setState(() {
@@ -230,7 +236,8 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
           });
         } else {
           // 응시 시간 계산
-          final gazeTime = DateTime.now().difference(_moleGazeStartTime[i]!).inMilliseconds;
+          final gazeTime =
+              DateTime.now().difference(_moleGazeStartTime[i]!).inMilliseconds;
 
           // 2초 이상 응시했으면 두더지 잡기 성공
           if (gazeTime >= 2000) {
@@ -264,7 +271,8 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
     final size = MediaQuery.of(context).size;
     final safeArea = MediaQuery.of(context).padding;
     final appBarHeight = AppBar().preferredSize.height;
-    final usableHeight = size.height - appBarHeight - safeArea.top - safeArea.bottom;
+    final usableHeight =
+        size.height - appBarHeight - safeArea.top - safeArea.bottom;
     final usableWidth = size.width;
 
     final cellWidth = usableWidth / 3;
@@ -277,8 +285,11 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Catch the Animal', style: GoogleFonts.roboto(color: Colors.black)),
-          backgroundColor: widget.isVibrant ? Color(0xFF88B4DD) : Color(0xFFA48F84),
+          title: Text('Catch the Animal',
+              style: GoogleFonts.roboto(color: Colors.black)),
+          backgroundColor: widget.isVibrant
+              ? const Color(0xFF88B4DD)
+              : const Color(0xFFA48F84),
           elevation: 0,
         ),
         body: SafeArea(
@@ -291,8 +302,8 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: widget.isVibrant
-                        ? [Color(0xFFB7D8F6), Color(0xFF7EB6E9)]
-                        : [Color(0xFFA38D7D), Color(0xFFA48F84)],
+                        ? [const Color(0xFFB7D8F6), const Color(0xFF7EB6E9)]
+                        : [const Color(0xFFA38D7D), const Color(0xFFA48F84)],
                   ),
                 ),
               ),
@@ -369,7 +380,9 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
                           child: Container(
                             margin: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
-                              color: widget.isVibrant ? Color(0xFF88B4DD) : Color(0xFFA48F84),
+                              color: widget.isVibrant
+                                  ? const Color(0xFF88B4DD)
+                                  : const Color(0xFFA48F84),
                               borderRadius: BorderRadius.circular(15),
                               boxShadow: [
                                 BoxShadow(
@@ -381,24 +394,35 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
                             ),
                             child: _moleVisible[index]
                                 ? Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(4.0),
-                                  child: Image.asset(
-                                    widget.isVibrant ? 'assets/images/bird.png' : 'assets/images/mole.png',
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                                if (_moleGazeStartTime[index] != null && !_moleGazing[index])
-                                  CircularProgressIndicator(
-                                    value: min(DateTime.now().difference(_moleGazeStartTime[index]!).inMilliseconds / 2000, 1.0),
-                                    strokeWidth: 5,
-                                    backgroundColor: Colors.grey.withOpacity(0.3),
-                                    color: Colors.green,
-                                  ),
-                              ],
-                            )
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Image.asset(
+                                          widget.isVibrant
+                                              ? 'assets/images/bird.png'
+                                              : 'assets/images/mole.png',
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                      if (_moleGazeStartTime[index] != null &&
+                                          !_moleGazing[index])
+                                        CircularProgressIndicator(
+                                          value: min(
+                                              DateTime.now()
+                                                      .difference(
+                                                          _moleGazeStartTime[
+                                                              index]!)
+                                                      .inMilliseconds /
+                                                  2000,
+                                              1.0),
+                                          strokeWidth: 5,
+                                          backgroundColor:
+                                              Colors.grey.withOpacity(0.3),
+                                          color: Colors.green,
+                                        ),
+                                    ],
+                                  )
                                 : Container(),
                           ),
                         );
@@ -476,7 +500,8 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
                                   icon: const Icon(Icons.refresh),
                                   label: const Text('Retry'),
                                   style: ElevatedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 12),
                                     backgroundColor: Colors.green,
                                     foregroundColor: Colors.white,
                                   ),
@@ -486,14 +511,16 @@ class _Exercise3State extends State<Exercise3> with WidgetsBindingObserver {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => HomeScreen(isVibrant: widget.isVibrant),
+                                        builder: (context) => HomeScreen(
+                                            isVibrant: widget.isVibrant),
                                       ),
                                     );
                                   },
                                   icon: const Icon(Icons.home),
                                   label: const Text('To Home'),
                                   style: ElevatedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 12),
                                     backgroundColor: Colors.blue,
                                     foregroundColor: Colors.white,
                                   ),

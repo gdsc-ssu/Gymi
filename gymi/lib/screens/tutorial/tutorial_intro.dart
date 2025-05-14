@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise2_ready_screen.dart';
+import 'package:eyedid_flutter_example/%08screens/tutorial/tutorial_ready_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
 import 'package:audioplayers/audioplayers.dart';
 
-class Exercise2IntroScreen extends StatefulWidget {
+class TutorialIntroScreen extends StatefulWidget {
   final bool isVibrant;
-  const Exercise2IntroScreen({super.key, required this.isVibrant});
+  const TutorialIntroScreen({super.key, required this.isVibrant});
 
   @override
-  State<Exercise2IntroScreen> createState() => _Exercise2IntroScreenState();
+  State<TutorialIntroScreen> createState() => _TutorialIntroScreenState();
 }
 
-class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
+class _TutorialIntroScreenState extends State<TutorialIntroScreen> {
   // 현재 페이지 인덱스
   int _currentPage = 0;
 
@@ -63,7 +63,7 @@ class _Exercise2IntroScreenState extends State<Exercise2IntroScreen> {
       context,
       MaterialPageRoute(
           builder: (context) =>
-              Exercise2ReadyScreen(isVibrant: widget.isVibrant)),
+              TutorialReadyScreen(isVibrant: widget.isVibrant)),
     );
   }
 

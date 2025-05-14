@@ -1,4 +1,4 @@
-import 'package:eyedid_flutter_example/%08screens/exercise2.dart';
+import 'package:eyedid_flutter_example/%08screens/tutorial/tutorial.dart';
 import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -94,7 +94,7 @@ class BeforeGameView extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const Exercies2()
+                  MaterialPageRoute(builder: (context) => const Tutorial()
                       // 예시로 secondScreen을 넣으면 수정할 것
                       ),
                 );

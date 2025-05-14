@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise2.dart';
+import 'package:eyedid_flutter_example/%08screens/tutorial/tutorial.dart';
 import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class Exercise2ReadyScreen extends StatefulWidget {
+class TutorialReadyScreen extends StatefulWidget {
   final bool isVibrant;
-  const Exercise2ReadyScreen({super.key, this.isVibrant = true});
+  const TutorialReadyScreen({super.key, this.isVibrant = true});
 
   @override
-  State<Exercise2ReadyScreen> createState() => _Exercise2ReadyScreenState();
+  State<TutorialReadyScreen> createState() => _TutorialReadyScreenState();
 }
 
-class _Exercise2ReadyScreenState extends State<Exercise2ReadyScreen> {
+class _TutorialReadyScreenState extends State<TutorialReadyScreen> {
   @override
   void initState() {
     super.initState();
@@ -29,7 +29,7 @@ class _Exercise2ReadyScreenState extends State<Exercise2ReadyScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => Exercies2(isVibrant: widget.isVibrant),
+            builder: (context) => Tutorial(isVibrant: widget.isVibrant),
           ),
         );
       }
@@ -155,8 +155,7 @@ class _Exercise2ReadyScreenState extends State<Exercise2ReadyScreen> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        Exercies2(isVibrant: widget.isVibrant),
+                    builder: (context) => Tutorial(isVibrant: widget.isVibrant),
                   ),
                 );
               },

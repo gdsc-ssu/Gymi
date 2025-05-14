@@ -3,13 +3,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:eyedid_flutter_example/%08screens/calibration_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/color_select_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/home_screen.dart';
-import 'package:eyedid_flutter_example/%08screens/second_screen.dart';
 import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
 import 'package:eyedid_flutter_example/gaze_overlay.dart';
 import 'package:eyedid_flutter_example/service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:eyedid_flutter_example/%08screens/exercise2.dart';
+import 'package:eyedid_flutter_example/%08screens/tutorial/tutorial.dart';
 
 import 'package:flutter/services.dart';
 import 'package:eyedid_flutter/gaze_tracker_options.dart';
