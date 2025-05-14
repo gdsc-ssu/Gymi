@@ -6,7 +6,7 @@ import 'home_screen.dart';
 class GoodScreen extends StatefulWidget {
   final bool isVibrant;
 
-  const GoodScreen({Key? key, required this.isVibrant}) : super(key: key);
+  const GoodScreen({super.key, required this.isVibrant});
 
   @override
   _GoodScreenState createState() => _GoodScreenState();
@@ -45,10 +45,9 @@ class _GoodScreenState extends State<GoodScreen> {
                   TextSpan(
                       text: 'Our AI model suggests that\n',
                       style: GoogleFonts.roboto(
-                          fontSize: 64,
-                          fontWeight: FontWeight.w200,
-                      )
-                  ),
+                        fontSize: 64,
+                        fontWeight: FontWeight.w200,
+                      )),
                   TextSpan(
                     text: 'your eye alignment appears to be within the ',
                     style: GoogleFonts.roboto(
@@ -59,7 +58,7 @@ class _GoodScreenState extends State<GoodScreen> {
                     style: GoogleFonts.roboto(
                       fontWeight: FontWeight.bold,
                       fontSize: 40,
-                      color: Color(0xFFCCF436), // lime green
+                      color: const Color(0xFFCCF436), // lime green
                     ),
                   ),
                 ],
@@ -84,22 +83,23 @@ class _GoodScreenState extends State<GoodScreen> {
                   TextSpan(
                       text: 'Please note that this is ',
                       style: GoogleFonts.roboto(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w400,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w400,
                       ) // white
-                  ),
+                      ),
                   TextSpan(
                     text: 'NOT a medical diagnosis.\n',
                     style: GoogleFonts.roboto(
                         fontWeight: FontWeight.bold, fontSize: 24),
                   ),
                   TextSpan(
-                      text: 'If you have concerns about your vision, we recommend visiting an eye specialist for a professional evaluation.',
+                      text:
+                          'If you have concerns about your vision, we recommend visiting an eye specialist for a professional evaluation.',
                       style: GoogleFonts.roboto(
                         fontSize: 24,
                         fontWeight: FontWeight.w400,
                       ) // white
-                  ),
+                      ),
                 ],
               ),
             ),
