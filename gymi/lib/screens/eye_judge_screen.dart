@@ -130,14 +130,29 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Check Cropped Image'),
+            backgroundColor: Color(widget.isVibrant ? 0xFFAEC7DF : 0xFFA38D7D),
+            title: Text(
+                'Check Cropped Image',
+                style: GoogleFonts.lato(
+                  color: Color(widget.isVibrant ? 0xFF0069D7 : 0xFF59302D),
+                  fontSize: 28,
+                  fontWeight: FontWeight.w400,
+                )
+            ),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Image.file(croppedFile),
                   const SizedBox(height: 16),
-                  const Text('Would you like to proceed using this image?'),
+                  Text(
+                      'Would you like to proceed using this image?',
+                      style: GoogleFonts.lato(
+                        color: Color(widget.isVibrant ? 0xFF0069D7 : 0xFF59302D),
+                        fontSize: 24,
+                        fontWeight: FontWeight.w400,
+                      )
+                  ),
                 ],
               ),
             ),
@@ -146,13 +161,26 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
                 onPressed: () {
                   Navigator.of(context).pop(false);
                 },
-                child: const Text('Try Again'),
+                child: Text(
+                    'Try Again',
+                    style: GoogleFonts.lato(
+                      color: Color(widget.isVibrant ? 0xFF0069D7 : 0xFF59302D),
+                      fontSize: 24,
+                      fontWeight: FontWeight.w400,
+                    )
+                ),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop(true);
                 },
-                child: const Text('Proceed'),
+                child: Text('Proceed',
+                    style: GoogleFonts.lato(
+                      color: Color(widget.isVibrant ? 0xFF0069D7 : 0xFF59302D),
+                      fontSize: 24,
+                      fontWeight: FontWeight.w400,
+                    )
+                ),
               ),
             ],
           );
