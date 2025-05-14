@@ -126,6 +126,39 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
       final croppedFile = File('${file.path}_cropped.jpg');
       await croppedFile.writeAsBytes(croppedBytes);
 
+      if (!mounted) return;
+
+      // 크롭된 이미지 확인 다이얼로그 표시
+      final shouldProceed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Check Cropped Image'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.file(croppedFile),
+              const SizedBox(height: 16),
+              const Text('Would you like to proceed using this image?'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Try Again'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Proceed'),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldProceed != true) {
+        setState(() => _isLoading = false);
+        return;
+      }
+
       // API 요청
       final request = http.MultipartRequest(
         'POST',
