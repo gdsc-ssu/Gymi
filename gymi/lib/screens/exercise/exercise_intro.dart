@@ -1,13 +1,13 @@
-import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level10_screen.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level1_screen.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level2_screen.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level3_screen.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level4_screen.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level5_screen.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level6_screen.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level7_screen.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level8_screen.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level9_screen.dart';
+import 'package:eyedid_flutter_example/screens/exercise/exercise_level10_screen.dart';
+import 'package:eyedid_flutter_example/screens/exercise/exercise_level1_screen.dart';
+import 'package:eyedid_flutter_example/screens/exercise/exercise_level2_screen.dart';
+import 'package:eyedid_flutter_example/screens/exercise/exercise_level3_screen.dart';
+import 'package:eyedid_flutter_example/screens/exercise/exercise_level4_screen.dart';
+import 'package:eyedid_flutter_example/screens/exercise/exercise_level5_screen.dart';
+import 'package:eyedid_flutter_example/screens/exercise/exercise_level6_screen.dart';
+import 'package:eyedid_flutter_example/screens/exercise/exercise_level7_screen.dart';
+import 'package:eyedid_flutter_example/screens/exercise/exercise_level8_screen.dart';
+import 'package:eyedid_flutter_example/screens/exercise/exercise_level9_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 // 여기에 LevelIntro 및 Stage import 추가 필요

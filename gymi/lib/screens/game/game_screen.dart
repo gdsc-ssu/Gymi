@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:eyedid_flutter_example/%08screens/home_screen.dart';
+import 'package:eyedid_flutter_example/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:google_fonts/google_fonts.dart';

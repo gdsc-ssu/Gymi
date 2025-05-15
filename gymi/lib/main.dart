@@ -1,4 +1,4 @@
-import 'package:eyedid_flutter_example/%08screens/login_screen.dart';
+import 'package:eyedid_flutter_example/screens/login_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:eyedid_flutter_example/service/audio_service.dart';
 import 'package:flutter/material.dart';

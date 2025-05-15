@@ -1,27 +1,27 @@
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level7_screen.dart';
+import 'package:eyedid_flutter_example/screens/exercise/exercise_level9_screen.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'exercise_intro.dart'; // ← 다음 스크린으로 이동할 때 필요
 
-class ExerciseLevel6Stage extends StatefulWidget {
+class ExerciseLevel8Stage extends StatefulWidget {
   final bool isVibrant;
   final bool isSingleMode;
 
-  const ExerciseLevel6Stage({
+  const ExerciseLevel8Stage({
     super.key,
     this.isVibrant = true,
     this.isSingleMode = false,
   });
 
   @override
-  State<ExerciseLevel6Stage> createState() => _ExerciseLevel6StageState();
+  State<ExerciseLevel8Stage> createState() => _ExerciseLevel8StageState();
 }
 
-class _ExerciseLevel6StageState extends State<ExerciseLevel6Stage>
+class _ExerciseLevel8StageState extends State<ExerciseLevel8Stage>
     with SingleTickerProviderStateMixin {
   double _progress = 0.0;
   DateTime _startTime = DateTime.now();
@@ -37,14 +37,12 @@ class _ExerciseLevel6StageState extends State<ExerciseLevel6Stage>
 
   final _gazeService = GazeTrackerService();
   StreamSubscription<dynamic>? _gazeSubscription;
-
   @override
   void initState() {
     super.initState();
     _gazeService.setShowOverlay(true);
     _setupGazeTracking();
     _lottieController = AnimationController(vsync: this);
-
     _startTime = DateTime.now();
 
     _progressTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
@@ -66,25 +64,6 @@ class _ExerciseLevel6StageState extends State<ExerciseLevel6Stage>
     });
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _gazeService.updateContext(context);
-      _gazeService.refreshOverlay();
-    });
-  }
-
-  @override
-  void dispose() {
-    _gazeSubscription?.cancel();
-    _lottieController.dispose();
-    _progressTimer?.cancel();
-    _audioPlayer.dispose();
-    _gazeService.setShowOverlay(true);
-    super.dispose();
-  }
-
   void _onSessionComplete() {
     setState(() {
       _showCompletionMessage = true;
@@ -104,12 +83,31 @@ class _ExerciseLevel6StageState extends State<ExerciseLevel6Stage>
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => ExerciseLevel7Intro(
+            builder: (context) => ExerciseLevel9Intro(
                 isVibrant: widget.isVibrant, isSingleMode: false),
           ),
         );
       }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _gazeService.updateContext(context);
+      _gazeService.refreshOverlay();
+    });
+  }
+
+  @override
+  void dispose() {
+    _gazeSubscription?.cancel();
+    _lottieController.dispose();
+    _progressTimer?.cancel();
+    _audioPlayer.dispose();
+    _gazeService.setShowOverlay(true);
+    super.dispose();
   }
 
   void _setupGazeTracking() {
@@ -147,7 +145,7 @@ class _ExerciseLevel6StageState extends State<ExerciseLevel6Stage>
                   children: const [
                     TextSpan(
                         text:
-                            "Draw a circle counterclockwise until green check. (30s)"),
+                            "Follow the target point moving in an infinity shape. \nPlease keep your head still. (30s)"),
                   ],
                 ),
               ),
@@ -171,19 +169,20 @@ class _ExerciseLevel6StageState extends State<ExerciseLevel6Stage>
                       ),
                     ],
                   )
-                : Transform(
-                    transform: Matrix4.rotationY(3.1416), // 또는 pi
-                    alignment: Alignment.center, // 중심축 기준으로 뒤집기
+                : Transform.rotate(
+                    angle: 3.1416, // 180도 회전
                     child: SizedBox(
                       width: 700,
                       height: 700,
                       child: Lottie.asset(
-                        'assets/animations/spin.json',
+                        'assets/animations/infinity.json',
                         controller: _lottieController,
                         onLoaded: (composition) {
-                          _lottieController.duration = composition.duration * 2;
+                          _lottieController.duration =
+                              composition.duration * 2; // 속도 0.5배
                           _lottieController.repeat();
                         },
+                        repeat: true,
                         fit: BoxFit.contain,
                       ),
                     ),
@@ -219,7 +218,7 @@ class _ExerciseLevel6StageState extends State<ExerciseLevel6Stage>
             left: 0,
             right: 0,
             child: Text(
-              "Level 6",
+              "Level 8",
               textAlign: TextAlign.center,
               style: GoogleFonts.roboto(
                   color: Colors.white,
@@ -252,17 +251,17 @@ class _ExerciseLevel6StageState extends State<ExerciseLevel6Stage>
   }
 }
 
-class ExerciseLevel6Intro extends StatefulWidget {
+class ExerciseLevel8Intro extends StatefulWidget {
   final bool isVibrant;
   final bool isSingleMode;
-  const ExerciseLevel6Intro(
+  const ExerciseLevel8Intro(
       {super.key, this.isVibrant = true, this.isSingleMode = false});
 
   @override
-  State<ExerciseLevel6Intro> createState() => _ExerciseLevel6IntroState();
+  State<ExerciseLevel8Intro> createState() => _ExerciseLevel8IntroState();
 }
 
-class _ExerciseLevel6IntroState extends State<ExerciseLevel6Intro> {
+class _ExerciseLevel8IntroState extends State<ExerciseLevel8Intro> {
   @override
   void initState() {
     super.initState();
@@ -273,7 +272,7 @@ class _ExerciseLevel6IntroState extends State<ExerciseLevel6Intro> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => ExerciseLevel6Stage(
+            builder: (context) => ExerciseLevel8Stage(
               isVibrant: widget.isVibrant,
               isSingleMode: widget.isSingleMode, // Single Mode 여부 전달
             ),
@@ -304,7 +303,7 @@ class _ExerciseLevel6IntroState extends State<ExerciseLevel6Intro> {
           ),
           Center(
             child: Text(
-              "Level 6",
+              "Level 8",
               textAlign: TextAlign.center,
               style: GoogleFonts.roboto(
                   color: Colors.white,

@@ -1,4 +1,4 @@
-import 'package:eyedid_flutter_example/%08screens/calibration_screen.dart';
+import 'package:eyedid_flutter_example/screens/calibration_screen.dart';
 import 'package:eyedid_flutter_example/service/audio_service.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:flutter/material.dart';
