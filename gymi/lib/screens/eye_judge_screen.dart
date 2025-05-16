@@ -16,6 +16,7 @@ import 'home_screen.dart';
 
 class EyeJudgeScreen extends StatefulWidget {
   final bool isVibrant;
+
   const EyeJudgeScreen({super.key, required this.isVibrant});
 
   @override
@@ -29,8 +30,8 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
   String? _errorMessage;
   bool _isError = false;
   final GlobalKey _guideKey = GlobalKey();
-  var rectWidth = 300.0;
-  var rectHeight = 70.0;
+  var rectWidth = 600.0;
+  var rectHeight = 170.0;
 
   @override
   void initState() {
