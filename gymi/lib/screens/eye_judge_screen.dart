@@ -3,8 +3,8 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:camera/camera.dart';
-import 'package:eyedid_flutter_example/%08screens/bad_screen.dart';
-import 'package:eyedid_flutter_example/%08screens/good_screen.dart';
+import 'package:eyedid_flutter_example/screens/bad_screen.dart';
+import 'package:eyedid_flutter_example/screens/good_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -29,8 +29,8 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
   String? _errorMessage;
   bool _isError = false;
   final GlobalKey _guideKey = GlobalKey();
-  var rectWidth = 300.0;
-  var rectHeight = 70.0;
+  var rectWidth = 600.0;
+  var rectHeight = 170.0;
 
   @override
   void initState() {
@@ -41,7 +41,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
   Future<void> _initCamera() async {
     final cameras = await availableCameras();
     final front = cameras.firstWhere(
-      (camera) => camera.lensDirection == CameraLensDirection.front,
+          (camera) => camera.lensDirection == CameraLensDirection.front,
     );
 
     _controller = CameraController(front, ResolutionPreset.medium);
@@ -85,10 +85,10 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
     try {
       // 화면 스크린샷 캡처
       final RenderRepaintBoundary boundary =
-          _guideKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      _guideKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
       final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
       final ByteData? byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
+      await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) return;
 
       final bytes = byteData.buffer.asUint8List();
@@ -149,7 +149,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
                   Text('Would you like to proceed using this image?',
                       style: GoogleFonts.lato(
                         color:
-                            Color(widget.isVibrant ? 0xFF0069D7 : 0xFF59302D),
+                        Color(widget.isVibrant ? 0xFF0069D7 : 0xFF59302D),
                         fontSize: 24,
                         fontWeight: FontWeight.w400,
                       )),
@@ -214,10 +214,19 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
       }
 
       final prediction = result['prediction'];
+      print('AI result: $result');
       final isAbnormal =
           prediction['class'] != 'normal' && prediction['confidence'] >= 90;
 
-      if (isAbnormal) {
+      final geminiResult = await detectStrabismus(croppedFile);
+      print('Gemini Result: $geminiResult');
+      if (geminiResult == null) {
+        _showError('Error with Gemini API');
+        return;
+      }
+
+
+      if (isAbnormal && geminiResult == 'yes') {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -234,13 +243,65 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
       }
     } catch (e) {
       if (!mounted) return;
-      _showError('오류가 발생했습니다. 다시 시도해주세요.');
+      _showError('ERROR! Try Again!');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
       }
     }
   }
+
+  Future<String?> detectStrabismus(File imageFile) async {
+    const apiKey = '';
+    const endpoint = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=$apiKey';
+
+    final imageBytes = await imageFile.readAsBytes();
+    final base64Image = base64Encode(imageBytes);
+
+    final body = {
+      "contents": [
+        {
+          "parts": [
+            {
+              "text": "Determine if strabismus. Result should be only 'yes' or 'no'."
+            },
+            {
+              "inlineData": {
+                "mimeType": "image/jpeg",
+                "data": base64Image
+              }
+            }
+          ]
+        }
+      ]
+    };
+
+    final response = await http.post(
+      Uri.parse(endpoint),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final candidates = json['candidates'];
+      if (candidates != null && candidates.isNotEmpty) {
+        final content = candidates[0]['content'];
+        final parts = content['parts'];
+        if (parts != null && parts.isNotEmpty) {
+          final text = parts[0]['text'];
+          return text;
+        }
+      }
+    } else {
+      print('Gemini API 오류: ${response.statusCode}, ${response.body}');
+    }
+
+    return null;
+  }
+
 
   @override
   void dispose() {
@@ -404,7 +465,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
                       children: [
                         CircularProgressIndicator(
                           valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
+                          AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                         SizedBox(height: 16),
                         Text(
@@ -428,7 +489,7 @@ class _EyeJudgeScreenState extends State<EyeJudgeScreen> {
                 right: MediaQuery.of(context).size.width * 0.2,
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   decoration: BoxDecoration(
                     color: Colors.red,
                     borderRadius: BorderRadius.circular(8),

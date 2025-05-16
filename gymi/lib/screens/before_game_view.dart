@@ -1,5 +1,5 @@
-import 'package:eyedid_flutter_example/%08screens/tutorial/tutorial.dart';
-import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
+import 'package:eyedid_flutter_example/screens/tutorial/tutorial.dart';
+import 'package:eyedid_flutter_example/screens/setting_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 

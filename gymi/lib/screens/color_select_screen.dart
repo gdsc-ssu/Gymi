@@ -1,4 +1,4 @@
-import 'package:eyedid_flutter_example/%08screens/eye_camera_explain.dart';
+import 'package:eyedid_flutter_example/screens/eye_camera_explain.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 

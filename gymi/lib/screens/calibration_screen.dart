@@ -1,5 +1,5 @@
 import 'package:eyedid_flutter/constants/eyedid_flutter_calibration_option.dart';
-import 'package:eyedid_flutter_example/%08screens/tutorial/tutorial_intro.dart';
+import 'package:eyedid_flutter_example/screens/tutorial/tutorial_intro.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';

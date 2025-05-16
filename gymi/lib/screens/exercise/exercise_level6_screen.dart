@@ -1,34 +1,34 @@
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level6_screen.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise/exercise_intro.dart';
+import 'package:eyedid_flutter_example/screens/exercise/exercise_level7_screen.dart';
 import 'package:eyedid_flutter_example/service/gaze_tracker_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
+import 'exercise_intro.dart'; // ← 다음 스크린으로 이동할 때 필요
 
-class ExerciseLevel5Stage extends StatefulWidget {
+class ExerciseLevel6Stage extends StatefulWidget {
   final bool isVibrant;
   final bool isSingleMode;
 
-  const ExerciseLevel5Stage({
+  const ExerciseLevel6Stage({
     super.key,
     this.isVibrant = true,
     this.isSingleMode = false,
   });
 
   @override
-  State<ExerciseLevel5Stage> createState() => _ExerciseLevel5StageState();
+  State<ExerciseLevel6Stage> createState() => _ExerciseLevel6StageState();
 }
 
-class _ExerciseLevel5StageState extends State<ExerciseLevel5Stage>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+class _ExerciseLevel6StageState extends State<ExerciseLevel6Stage>
+    with SingleTickerProviderStateMixin {
   double _progress = 0.0;
   DateTime _startTime = DateTime.now();
   Timer? _progressTimer;
+  final AudioPlayer _audioPlayer = AudioPlayer();
   late final AnimationController _lottieController;
   bool _showCompletionMessage = false;
-  final AudioPlayer _audioPlayer = AudioPlayer();
 
   double _x = 0.0;
   double _y = 0.0;
@@ -41,26 +41,27 @@ class _ExerciseLevel5StageState extends State<ExerciseLevel5Stage>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
-
-    _lottieController = AnimationController(vsync: this);
-    _startTime = DateTime.now();
-
     _gazeService.setShowOverlay(true);
     _setupGazeTracking();
+    _lottieController = AnimationController(vsync: this);
+
+    _startTime = DateTime.now();
 
     _progressTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       final elapsed = DateTime.now().difference(_startTime).inMilliseconds;
+
       if (!mounted) {
         timer.cancel();
         return;
       }
+
       setState(() {
         _progress = (elapsed / (30 * 1000)).clamp(0.0, 1.0);
       });
+
       if (_progress >= 1.0) {
         timer.cancel();
-        _showCompletion();
+        _onSessionComplete();
       }
     });
   }
@@ -69,31 +70,26 @@ class _ExerciseLevel5StageState extends State<ExerciseLevel5Stage>
   void didChangeDependencies() {
     super.didChangeDependencies();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _gazeService.updateContext(context); // 👈 overlay에 context 반영
-      _gazeService.refreshOverlay(); // 👈 overlay 다시 그리기
+      _gazeService.updateContext(context);
+      _gazeService.refreshOverlay();
     });
   }
 
-  void _setupGazeTracking() {
-    _gazeSubscription = _gazeService.gazePositionStream.listen((data) {
-      if (!mounted) return;
-      setState(() {
-        _x = data['x'];
-        _y = data['y'];
-        _gazeColor = data['color'];
-        _dotSize = data['size'];
-      });
-    });
+  @override
+  void dispose() {
+    _gazeSubscription?.cancel();
+    _lottieController.dispose();
+    _progressTimer?.cancel();
+    _audioPlayer.dispose();
+    _gazeService.setShowOverlay(true);
+    super.dispose();
   }
 
-  void _showCompletion() {
+  void _onSessionComplete() {
     setState(() {
       _showCompletionMessage = true;
     });
-
-    _gazeService.setShowOverlay(false); // 👈 다음 스테이지로 넘어가기 전에 끄기
     _audioPlayer.play(AssetSource('audio/correct.mp3'));
-
     Future.delayed(const Duration(seconds: 3), () {
       if (!mounted) return;
       if (widget.isSingleMode) {
@@ -108,7 +104,7 @@ class _ExerciseLevel5StageState extends State<ExerciseLevel5Stage>
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => ExerciseLevel6Intro(
+            builder: (context) => ExerciseLevel7Intro(
                 isVibrant: widget.isVibrant, isSingleMode: false),
           ),
         );
@@ -116,15 +112,16 @@ class _ExerciseLevel5StageState extends State<ExerciseLevel5Stage>
     });
   }
 
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _gazeSubscription?.cancel();
-    _lottieController.dispose();
-    _progressTimer?.cancel();
-    _audioPlayer.dispose();
-    _gazeService.setShowOverlay(true); // 초기화용 true 설정
-    super.dispose();
+  void _setupGazeTracking() {
+    _gazeSubscription = _gazeService.gazePositionStream.listen((data) {
+      if (!mounted) return;
+      setState(() {
+        _x = data['x'];
+        _y = data['y'];
+        _gazeColor = data['color'];
+        _dotSize = data['size'];
+      });
+    });
   }
 
   @override
@@ -150,7 +147,7 @@ class _ExerciseLevel5StageState extends State<ExerciseLevel5Stage>
                   children: const [
                     TextSpan(
                         text:
-                            "Draw a circle with your eyes clockwise until you see the green check. (30s)"),
+                            "Draw a circle counterclockwise until green check. (30s)"),
                   ],
                 ),
               ),
@@ -174,22 +171,24 @@ class _ExerciseLevel5StageState extends State<ExerciseLevel5Stage>
                       ),
                     ],
                   )
-                : Lottie.asset(
-                    'assets/animations/spin.json',
-                    controller: _lottieController,
-                    onLoaded: (composition) {
-                      _lottieController.duration = composition.duration * 2;
-                      _lottieController.repeat();
-                    },
-                    width: 700,
-                    height: 700,
-                    repeat: true,
-                    animate: true,
-                    fit: BoxFit.contain,
+                : Transform(
+                    transform: Matrix4.rotationY(3.1416), // 또는 pi
+                    alignment: Alignment.center, // 중심축 기준으로 뒤집기
+                    child: SizedBox(
+                      width: 700,
+                      height: 700,
+                      child: Lottie.asset(
+                        'assets/animations/spin.json',
+                        controller: _lottieController,
+                        onLoaded: (composition) {
+                          _lottieController.duration = composition.duration * 2;
+                          _lottieController.repeat();
+                        },
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ),
           ),
-
-          // 상단 우측: 진행도
           Positioned(
             top: 40,
             right: 40,
@@ -206,14 +205,29 @@ class _ExerciseLevel5StageState extends State<ExerciseLevel5Stage>
                         const AlwaysStoppedAnimation<Color>(Colors.white),
                     strokeWidth: 6,
                   ),
-                  const Icon(Icons.access_time,
-                      color: Colors.black45, size: 32),
+                  const Icon(
+                    Icons.access_time,
+                    color: Colors.black45,
+                    size: 32,
+                  ),
                 ],
               ),
             ),
           ),
-
-          // 상단 좌측: 뒤로가기
+          Positioned(
+            bottom: 50,
+            left: 0,
+            right: 0,
+            child: Text(
+              "Level 6",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.roboto(
+                  color: Colors.white,
+                  fontSize: 36,
+                  fontStyle: FontStyle.normal,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
           Positioned(
             top: 40,
             left: 40,
@@ -223,28 +237,13 @@ class _ExerciseLevel5StageState extends State<ExerciseLevel5Stage>
                 borderRadius: BorderRadius.circular(10),
               ),
               child: IconButton(
-                icon: const Icon(Icons.arrow_back,
-                    size: 30, color: Colors.black54),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+                icon: const Icon(
+                  Icons.arrow_back,
+                  size: 30,
+                  color: Colors.black54,
+                ),
+                onPressed: () => Navigator.pop(context),
               ),
-            ),
-          ),
-
-          // 하단 중앙: Level 표시
-          Positioned(
-            bottom: 50,
-            left: 0,
-            right: 0,
-            child: Text(
-              "Level 5",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.roboto(
-                  color: Colors.white,
-                  fontSize: 36,
-                  fontStyle: FontStyle.normal,
-                  fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -253,29 +252,30 @@ class _ExerciseLevel5StageState extends State<ExerciseLevel5Stage>
   }
 }
 
-class ExerciseLevel5Intro extends StatefulWidget {
+class ExerciseLevel6Intro extends StatefulWidget {
   final bool isVibrant;
   final bool isSingleMode;
-  const ExerciseLevel5Intro(
+  const ExerciseLevel6Intro(
       {super.key, this.isVibrant = true, this.isSingleMode = false});
 
   @override
-  State<ExerciseLevel5Intro> createState() => _ExerciseLevel5IntroState();
+  State<ExerciseLevel6Intro> createState() => _ExerciseLevel6IntroState();
 }
 
-class _ExerciseLevel5IntroState extends State<ExerciseLevel5Intro> {
+class _ExerciseLevel6IntroState extends State<ExerciseLevel6Intro> {
   @override
   void initState() {
     super.initState();
 
+    // 3초 후 자동 이동
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => ExerciseLevel5Stage(
+            builder: (context) => ExerciseLevel6Stage(
               isVibrant: widget.isVibrant,
-              isSingleMode: widget.isSingleMode,
+              isSingleMode: widget.isSingleMode, // Single Mode 여부 전달
             ),
           ),
         );
@@ -290,12 +290,13 @@ class _ExerciseLevel5IntroState extends State<ExerciseLevel5Intro> {
           widget.isVibrant ? const Color(0xFFAEC7DF) : const Color(0xFFA38D7D),
       body: Stack(
         children: [
+          /// 1️⃣ PNG 이미지를 오른쪽 정렬(Align.end) + 자연스럽게 잘리도록 ClipRect 사용
           Align(
-            alignment: Alignment.centerRight,
+            alignment: Alignment.centerRight, // 👉 오른쪽 정렬
             child: ClipRect(
               child: Image.asset(
-                'assets/images/gymiBackground.png',
-                fit: BoxFit.fitHeight,
+                'assets/images/gymiBackground.png', // ✅ PNG 이미지 경로
+                fit: BoxFit.fitHeight, // ✅ 화면 크기에 맞춰 자연스럽게 채우기
                 width: 650,
                 height: 900,
               ),
@@ -303,7 +304,7 @@ class _ExerciseLevel5IntroState extends State<ExerciseLevel5Intro> {
           ),
           Center(
             child: Text(
-              "Level 5",
+              "Level 6",
               textAlign: TextAlign.center,
               style: GoogleFonts.roboto(
                   color: Colors.white,

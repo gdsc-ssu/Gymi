@@ -1,5 +1,5 @@
-import 'package:eyedid_flutter_example/%08screens/eye_judge_screen.dart';
-import 'package:eyedid_flutter_example/%08screens/home_screen.dart';
+import 'package:eyedid_flutter_example/screens/eye_judge_screen.dart';
+import 'package:eyedid_flutter_example/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 

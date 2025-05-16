@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../service/gaze_tracker_service.dart';
-import 'package:eyedid_flutter_example/%08screens/home_screen.dart';
-import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
+import 'package:eyedid_flutter_example/screens/home_screen.dart';
+import 'package:eyedid_flutter_example/screens/setting_screen.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class Tutorial extends StatefulWidget {

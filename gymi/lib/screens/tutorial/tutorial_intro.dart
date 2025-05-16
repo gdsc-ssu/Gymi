@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
-import 'package:eyedid_flutter_example/%08screens/tutorial/tutorial_ready_screen.dart';
-import 'package:eyedid_flutter_example/%08screens/setting_screen.dart';
+import 'package:eyedid_flutter_example/screens/tutorial/tutorial_ready_screen.dart';
+import 'package:eyedid_flutter_example/screens/setting_screen.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class TutorialIntroScreen extends StatefulWidget {

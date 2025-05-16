@@ -1,23 +1,23 @@
 import 'dart:async';
-import 'package:eyedid_flutter_example/%08screens/exercise/exercise_intro.dart';
-import 'package:eyedid_flutter_example/%08screens/exercise/exercise_level5_screen.dart';
+import 'package:eyedid_flutter_example/screens/exercise/exercise_intro.dart';
+import 'package:eyedid_flutter_example/screens/exercise/exercise_level3_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../service/gaze_tracker_service.dart';
 import 'package:audioplayers/audioplayers.dart';
 
-class ExerciseLevel4Stage extends StatefulWidget {
+class ExerciseLevel2Stage extends StatefulWidget {
   final bool isVibrant;
   final bool isSingleMode;
-  const ExerciseLevel4Stage(
+  const ExerciseLevel2Stage(
       {super.key, this.isVibrant = true, this.isSingleMode = false});
 
   @override
-  State<ExerciseLevel4Stage> createState() => _ExerciseLevel4StageState();
+  State<ExerciseLevel2Stage> createState() => _ExerciseLevel2StageState();
 }
 
-class _ExerciseLevel4StageState extends State<ExerciseLevel4Stage>
+class _ExerciseLevel2StageState extends State<ExerciseLevel2Stage>
     with WidgetsBindingObserver {
   final _gazeService = GazeTrackerService();
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -25,14 +25,14 @@ class _ExerciseLevel4StageState extends State<ExerciseLevel4Stage>
   double _x = 0.0;
   double _y = 0.0;
 
-  String _currentTarget = 'left-down'; // 'left-down' 또는 'right-up'
+  String _currentTarget = 'left'; // 'left' 또는 'right'
   DateTime? _gazeStartTime;
   Timer? _gazeTimer;
   Timer? _progressTimer;
 
   bool _showCompletionMessage = false;
   bool _screenActive = true;
-  final bool _showTrackingFocus = true; // final 제거
+  final bool _showTrackingFocus = true; // 🔥 수정: final 제거해야 toggle 가능
 
   final int _dwellTime = 3000; // 3초
   final int _totalSessionTime = 30; // 30초
@@ -55,7 +55,7 @@ class _ExerciseLevel4StageState extends State<ExerciseLevel4Stage>
 
     _startTime = DateTime.now();
 
-    // ✅ sessionTimer 삭제, progressTimer만 사용
+    // 🔥 progressTimer만 사용
     _progressTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       final elapsed = DateTime.now().difference(_startTime).inMilliseconds;
 
@@ -123,32 +123,19 @@ class _ExerciseLevel4StageState extends State<ExerciseLevel4Stage>
         _dotSize = data['size'];
       });
 
-      _detectDiagonal();
+      _detectLeftRight();
     });
   }
 
-  void _detectDiagonal() {
+  void _detectLeftRight() {
     if (_showCompletionMessage) return;
 
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
     final centerX = screenWidth / 2;
-    final centerY = screenHeight / 2;
 
-    bool inTarget = false;
+    String detectedDirection = _x < centerX ? 'left' : 'right';
 
-    if (_currentTarget == 'left-down') {
-      if (_x < centerX && _y > centerY) {
-        inTarget = true;
-      }
-    } else {
-      if (_x > centerX && _y < centerY) {
-        inTarget = true;
-      }
-    }
-
-    if (inTarget) {
+    if (detectedDirection == _currentTarget) {
       if (_gazeStartTime == null) {
         _gazeStartTime = DateTime.now();
         _startGazeTimer();
@@ -167,8 +154,7 @@ class _ExerciseLevel4StageState extends State<ExerciseLevel4Stage>
       HapticFeedback.mediumImpact();
 
       setState(() {
-        _currentTarget =
-            _currentTarget == 'left-down' ? 'right-up' : 'left-down';
+        _currentTarget = _currentTarget == 'left' ? 'right' : 'left';
         _gazeStartTime = null;
       });
     });
@@ -200,7 +186,7 @@ class _ExerciseLevel4StageState extends State<ExerciseLevel4Stage>
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => ExerciseLevel5Intro(
+              builder: (context) => ExerciseLevel3Intro(
                   isVibrant: widget.isVibrant, isSingleMode: false),
             ),
           );
@@ -232,7 +218,7 @@ class _ExerciseLevel4StageState extends State<ExerciseLevel4Stage>
                   children: const [
                     TextSpan(
                         text:
-                            "Look bottom-left to top-right until you see the green check. (30s)"),
+                            "Eyes left and right until green check. Head stays still. (30s)"),
                   ],
                 ),
               ),
@@ -246,32 +232,30 @@ class _ExerciseLevel4StageState extends State<ExerciseLevel4Stage>
                       const Icon(Icons.check_circle,
                           color: Colors.green, size: 100),
                       const SizedBox(height: 40),
-                      Text(
-                        "Workout is done!\nThank you for your effort!",
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.roboto(
-                            color: Colors.white,
-                            fontSize: 50,
-                            fontStyle: FontStyle.normal,
-                            fontWeight: FontWeight.bold),
-                      ),
+                      Text("Workout is done!\nThank you for your effort!",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.roboto(
+                              color: Colors.white,
+                              fontSize: 50,
+                              fontStyle: FontStyle.normal,
+                              fontWeight: FontWeight.bold)),
                     ],
                   )
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        _currentTarget == 'left-down'
-                            ? Icons.south_west
-                            : Icons.north_east,
+                        _currentTarget == 'left'
+                            ? Icons.arrow_back
+                            : Icons.arrow_forward,
                         color: Colors.white,
                         size: 200,
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        _currentTarget == 'left-down'
-                            ? "Move your eyes bottom-left"
-                            : "Move your eyes top-right",
+                        _currentTarget == 'left'
+                            ? "Move your eyes left"
+                            : "Move your eyes right",
                         style: GoogleFonts.roboto(
                             color: Colors.white,
                             fontSize: 40,
@@ -282,7 +266,7 @@ class _ExerciseLevel4StageState extends State<ExerciseLevel4Stage>
                   ),
           ),
 
-          // 🔥 왼쪽 상단: 뒤로 가기 버튼
+          // 왼쪽 상단: 뒤로 가기 버튼
           Positioned(
             top: 40,
             left: 40,
@@ -304,7 +288,7 @@ class _ExerciseLevel4StageState extends State<ExerciseLevel4Stage>
             ),
           ),
 
-          // 🔥 오른쪽 상단: 진행 인디케이터
+          // 오른쪽 상단: 진행도 인디케이터
           Positioned(
             top: 40,
             right: 40,
@@ -331,7 +315,7 @@ class _ExerciseLevel4StageState extends State<ExerciseLevel4Stage>
             ),
           ) /*,
 
-          // 🔥 왼쪽 상단 두번째 줄 : Focus 버튼
+          // 왼쪽 상단 Focus 버튼
           Positioned(
             left: 40,
             top: 120,
@@ -377,15 +361,13 @@ class _ExerciseLevel4StageState extends State<ExerciseLevel4Stage>
             bottom: 50,
             left: 0,
             right: 0,
-            child: Text(
-              "Level 4",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.roboto(
-                  color: Colors.white,
-                  fontSize: 36,
-                  fontStyle: FontStyle.normal,
-                  fontWeight: FontWeight.bold),
-            ),
+            child: Text("Level 2",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.roboto(
+                    color: Colors.white,
+                    fontSize: 36,
+                    fontStyle: FontStyle.normal,
+                    fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -393,17 +375,17 @@ class _ExerciseLevel4StageState extends State<ExerciseLevel4Stage>
   }
 }
 
-class ExerciseLevel4Intro extends StatefulWidget {
+class ExerciseLevel2Intro extends StatefulWidget {
   final bool isVibrant;
   final bool isSingleMode;
-  const ExerciseLevel4Intro(
+  const ExerciseLevel2Intro(
       {super.key, this.isVibrant = true, this.isSingleMode = false});
 
   @override
-  State<ExerciseLevel4Intro> createState() => _ExerciseLevel4IntroState();
+  State<ExerciseLevel2Intro> createState() => _ExerciseLevel2IntroState();
 }
 
-class _ExerciseLevel4IntroState extends State<ExerciseLevel4Intro> {
+class _ExerciseLevel2IntroState extends State<ExerciseLevel2Intro> {
   @override
   void initState() {
     super.initState();
@@ -414,7 +396,7 @@ class _ExerciseLevel4IntroState extends State<ExerciseLevel4Intro> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => ExerciseLevel4Stage(
+            builder: (context) => ExerciseLevel2Stage(
               isVibrant: widget.isVibrant,
               isSingleMode: widget.isSingleMode,
             ),
@@ -445,7 +427,7 @@ class _ExerciseLevel4IntroState extends State<ExerciseLevel4Intro> {
           ),
           Center(
             child: Text(
-              "Level 4",
+              "Level 2",
               textAlign: TextAlign.center,
               style: GoogleFonts.roboto(
                   color: Colors.white,
